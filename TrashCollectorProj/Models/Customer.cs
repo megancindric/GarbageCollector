@@ -23,6 +23,12 @@ namespace TrashCollectorProj.Models
         [Required]
         public string LastName { get; set; }
 
+        [Required]
+        public int PhoneNumber { get; set; }
+
+        [Required]
+        public string PickupDay { get; set; }
+
 
     }
 }

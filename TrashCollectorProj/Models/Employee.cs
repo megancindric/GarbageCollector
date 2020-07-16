@@ -22,5 +22,8 @@ namespace TrashCollectorProj.Models
 
         [Required]
         public string LastName { get; set; }
+
+        [Required]
+        public int ZipCode { get; set; }
     }
 }

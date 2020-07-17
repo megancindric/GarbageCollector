@@ -35,6 +35,7 @@ namespace TrashCollectorProj.Models
         public string State { get; set; }
         [Required]
         public int ZipCode { get; set; }
+        public bool IsSuspended { get; set; }
 
 
     }

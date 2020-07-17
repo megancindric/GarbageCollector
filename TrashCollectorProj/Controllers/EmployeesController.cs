@@ -25,7 +25,9 @@ namespace TrashCollectorProj.Controllers
         // GET: Employees
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Customer;
+            //NOTE for filtering later in the project - create index post method to filter customers by date
+            string currentDay = DateTime.Now.DayOfWeek.ToString();
+            var applicationDbContext = _context.Customer.Where(m => m.IsSuspended == false).Where(m => m.PickupDay == currentDay);
             return View(await applicationDbContext.ToListAsync());
         }
 

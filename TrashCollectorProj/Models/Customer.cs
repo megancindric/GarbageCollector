@@ -16,8 +16,6 @@ namespace TrashCollectorProj.Models
         [ForeignKey("IdentityUser")]
         public string IdentityUserId { get; set; }
         public IdentityUser IdentityUser { get; set; }
-        
-        public Address Address { get; set; }
 
         [Required]
         public string FirstName { get; set; }
@@ -25,11 +23,18 @@ namespace TrashCollectorProj.Models
         [Required]
         public string LastName { get; set; }
 
-        [Required]
         public int PhoneNumber { get; set; }
 
         [Required]
         public string PickupDay { get; set; }
+        [Required]
+        public string StreetName { get; set; }
+        [Required]
+        public string City { get; set; }
+        [Required]
+        public string State { get; set; }
+        [Required]
+        public int ZipCode { get; set; }
 
 
     }

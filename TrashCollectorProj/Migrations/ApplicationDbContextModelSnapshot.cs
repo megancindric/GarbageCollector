@@ -3,17 +3,15 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TrashCollectorProj.Data;
 
-namespace TrashCollectorProj.Data.Migrations
+namespace TrashCollectorProj.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200716200041_CustomerandEmployees")]
-    partial class CustomerandEmployees
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,15 +48,15 @@ namespace TrashCollectorProj.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "8962de1c-bef5-4164-8b81-1d69ead1e3c0",
-                            ConcurrencyStamp = "cd1638a6-6481-41a4-aea9-7f9ddf8b11f6",
+                            Id = "5008bb33-44a9-448b-a49a-49981b7363f9",
+                            ConcurrencyStamp = "e8c3fb2f-9c36-4e5a-b78c-e8241f87373a",
                             Name = "Employee",
                             NormalizedName = "EMPLOYEE"
                         },
                         new
                         {
-                            Id = "5fd47da4-76ab-4e91-80c0-d8e43c413d13",
-                            ConcurrencyStamp = "87d11c29-99a0-47cf-b382-fa53c3753713",
+                            Id = "9d3d9005-dded-4e98-9521-d7ca11ca7c40",
+                            ConcurrencyStamp = "083ebac1-ba20-469b-a2d4-a6ece3898cb8",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         });
@@ -240,6 +238,10 @@ namespace TrashCollectorProj.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -250,6 +252,24 @@ namespace TrashCollectorProj.Data.Migrations
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PhoneNumber")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PickupDay")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StreetName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ZipCode")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -275,6 +295,9 @@ namespace TrashCollectorProj.Data.Migrations
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ZipCode")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

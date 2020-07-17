@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using TrashCollectorProj.Models;
 
 namespace TrashCollectorProj.Areas.Identity.Pages.Account
 {
@@ -112,7 +113,15 @@ namespace TrashCollectorProj.Areas.Identity.Pages.Account
                     else
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
+                        if(Input.Role == "Customer")
+                        {
+                            return LocalRedirect("~/Customers/Create");
+                        }
+                        else
+                        {
+                            return LocalRedirect("~/Employees/Create");
+                        }
+                        
                     }
                 }
                 foreach (var error in result.Errors)

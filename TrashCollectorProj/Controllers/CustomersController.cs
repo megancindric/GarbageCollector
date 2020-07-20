@@ -75,9 +75,12 @@ namespace TrashCollectorProj.Controllers
         {
             if (ModelState.IsValid)
             {
+   
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 customer.IdentityUserId = userId;
+                customer.LastPickupDate = DateTime.UtcNow;
                 customer.IsSuspended = false;
+                customer.TrashFees = 0;
                 _context.Add(customer);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -119,12 +122,62 @@ namespace TrashCollectorProj.Controllers
             return View(customer);
         }
 
+        public async Task<IActionResult> MakePayment(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var customer = await _context.Customer.FindAsync(id);
+            if (customer == null)
+            {
+                return NotFound();
+            }
+            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
+            return View(customer);
+        }
+
         // POST: Customers/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode")] Customer customer)
+        {
+            if (id != customer.Id)
+            {
+                return NotFound();
+            }
+            var currentPerson = _context.Customer.FirstOrDefault(p => p.Id == id);
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    customer.TrashFees = currentPerson.TrashFees - customer.TrashFees;
+                    _context.Update(customer);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!CustomerExists(customer.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
+            return View(customer);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditPickupDay(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode")] Customer customer)
         {
             if (id != customer.Id)
             {
@@ -157,7 +210,7 @@ namespace TrashCollectorProj.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPickupDay(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode")] Customer customer)
+        public async Task<IActionResult> MakePayment(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode")] Customer customer)
         {
             if (id != customer.Id)
             {

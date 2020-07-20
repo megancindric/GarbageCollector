@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TrashCollectorProj.Data;
 
 namespace TrashCollectorProj.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200717205853_UpdateToCustomer")]
+    partial class UpdateToCustomer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,15 +50,15 @@ namespace TrashCollectorProj.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "3e4d552e-fd0c-4b0b-8e7e-2309806c831a",
-                            ConcurrencyStamp = "a277818a-41c7-442c-a803-360b52242156",
+                            Id = "bb7ae760-703f-4299-84df-bdf7fdd35872",
+                            ConcurrencyStamp = "c2d9fd5f-c042-4389-911c-d6d24d2ac0e4",
                             Name = "Employee",
                             NormalizedName = "EMPLOYEE"
                         },
                         new
                         {
-                            Id = "f6ffbcfe-a332-4147-ac34-f0b8cfabcaeb",
-                            ConcurrencyStamp = "484d0734-eeaa-41fd-a1cb-0926e1664205",
+                            Id = "96e02cc7-8ad0-4805-8b48-1a1dd08a507f",
+                            ConcurrencyStamp = "65c32228-a88e-423d-8127-0c4156ffa147",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         });
@@ -256,9 +258,6 @@ namespace TrashCollectorProj.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("LastPickupDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("PhoneNumber")
                         .HasColumnType("int");
 
@@ -273,9 +272,6 @@ namespace TrashCollectorProj.Migrations
                     b.Property<string>("StreetName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("TrashFees")
-                        .HasColumnType("float");
 
                     b.Property<int>("ZipCode")
                         .HasColumnType("int");

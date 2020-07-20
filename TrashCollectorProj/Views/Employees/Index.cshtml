@@ -72,7 +72,8 @@
                 @Html.DisplayFor(modelItem => item.ZipCode)
             </td>
             <td>
-                <a asp-action="ConfirmPickup" asp-route-id="@item.Id">Confirm this Pickup</a> |
+                <a asp-action="ConfirmPickup" asp-route-id="@item.Id">Confirm this Pickup</a>
+                <a asp-action="DeleteCustomer" asp-route-id="@item.Id">Remove Customer [TESTING PURPOSES]</a>
             </td>
         </tr>
 }

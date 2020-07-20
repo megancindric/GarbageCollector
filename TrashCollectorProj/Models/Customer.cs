@@ -26,7 +26,7 @@ namespace TrashCollectorProj.Models
         public int PhoneNumber { get; set; }
 
         [Required]
-        public string PickupDay { get; set; }
+        public DayOfWeek PickupDay { get; set; }
         [Required]
         public string StreetName { get; set; }
         [Required]

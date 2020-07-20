@@ -199,6 +199,24 @@ namespace TrashCollectorProj.Controllers
             return View(employee);
         }
 
+        public async Task<IActionResult> DeleteCustomer(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var customer = await _context.Customer
+                .Include(e => e.IdentityUser)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (customer == null)
+            {
+                return NotFound();
+            }
+
+            return View(customer);
+        }
+
         // POST: Employees/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -219,5 +237,17 @@ namespace TrashCollectorProj.Controllers
         {
             return _context.Customer.Any(e => e.Id == id);
         }
+
+        [HttpPost, ActionName("DeleteCustomer")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteCustomerConfirmed(int id)
+        {
+            var customer = await _context.Customer.FindAsync(id);
+            _context.Customer.Remove(customer);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+       
     }
 }

@@ -27,7 +27,7 @@ namespace TrashCollectorProj.Controllers
         {
             //NOTE for filtering later in the project - create index post method to filter customers by date
             string currentDay = DateTime.Now.DayOfWeek.ToString();
-            var applicationDbContext = _context.Customer.Where(m => m.IsSuspended == false).Where(m => m.PickupDay == currentDay);
+            var applicationDbContext = _context.Customer.Where(m => m.IsSuspended == false);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -93,6 +93,22 @@ namespace TrashCollectorProj.Controllers
             return View(employee);
         }
 
+        public async Task<IActionResult> ConfirmPickup(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var customer = await _context.Customer.FindAsync(id);
+            if (customer == null)
+            {
+                return NotFound();
+            }
+            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
+            return View(customer);
+        }
+
         // POST: Employees/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -129,6 +145,41 @@ namespace TrashCollectorProj.Controllers
             return View(employee);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmPickup(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode")] Customer customer)
+        {
+            if (id != customer.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    customer.LastPickupDate = DateTime.UtcNow;
+                    customer.TrashFees += 30;
+                    _context.Update(customer);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!CustomerExists(customer.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
+            return View(customer);
+        }
+
         // GET: Employees/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -162,6 +213,11 @@ namespace TrashCollectorProj.Controllers
         private bool EmployeeExists(int id)
         {
             return _context.Employee.Any(e => e.Id == id);
+        }
+
+        private bool CustomerExists(int id)
+        {
+            return _context.Customer.Any(e => e.Id == id);
         }
     }
 }

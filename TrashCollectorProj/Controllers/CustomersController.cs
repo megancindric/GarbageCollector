@@ -78,7 +78,6 @@ namespace TrashCollectorProj.Controllers
    
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 customer.IdentityUserId = userId;
-                customer.LastPickupDate = DateTime.UtcNow;
                 customer.IsSuspended = false;
                 customer.TrashFees = 0;
                 _context.Add(customer);

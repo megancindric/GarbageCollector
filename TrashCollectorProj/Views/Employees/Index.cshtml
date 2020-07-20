@@ -10,6 +10,16 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+<form asp-action="Index" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Find Pickups by Day: <input type="text" name="SearchString" value="@ViewData["currentFilter"]" />
+            <input type="submit" value="Search" class="btn btn-default" /> |
+            <a asp-action="Index">Back to Full List of Pickups</a>
+        </p>
+    </div>
+</form>
 <table class="table">
     <thead>
         <tr>
@@ -62,7 +72,7 @@
                 @Html.DisplayFor(modelItem => item.ZipCode)
             </td>
             <td>
-                <a asp-action="Details" asp-route-id="@item.Id">ADD BUTTON HERE TO CONFIRM PICKUP</a> |
+                <a asp-action="ConfirmPickup" asp-route-id="@item.Id">Confirm this Pickup</a> |
             </td>
         </tr>
 }

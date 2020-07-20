@@ -156,24 +156,51 @@ namespace TrashCollectorProj.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                if(customer.HasExtraPickup == true)
                 {
-                    customer.LastPickupDate = DateTime.UtcNow;
-                    customer.TrashFees += 30;
-                    _context.Update(customer);
-                    await _context.SaveChangesAsync();
+                    try
+                    {
+                        customer.LastPickupDate = DateTime.UtcNow;
+                        customer.TrashFees += 30;
+                        customer.HasExtraPickup = false;
+                        customer.ExtraPickupDate = default(DateTime);
+                        _context.Update(customer);
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!CustomerExists(customer.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!CustomerExists(customer.Id))
+                    try
                     {
-                        return NotFound();
+                        customer.LastPickupDate = DateTime.UtcNow;
+                        customer.TrashFees += 30;
+                        _context.Update(customer);
+                        await _context.SaveChangesAsync();
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!CustomerExists(customer.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
                 }
+               
                 return RedirectToAction(nameof(Index));
             }
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);

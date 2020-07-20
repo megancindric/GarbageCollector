@@ -48,15 +48,15 @@ namespace TrashCollectorProj.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "8ead62db-9337-4b2b-8af1-a1c4fd118eb9",
-                            ConcurrencyStamp = "b5a70d1c-8690-4a5e-91ad-db7a9195e3f2",
+                            Id = "5e8525e4-a4e0-4ad3-a031-2697b7217d31",
+                            ConcurrencyStamp = "7fe7b69a-5f0e-4b04-8205-a8d500d87b43",
                             Name = "Employee",
                             NormalizedName = "EMPLOYEE"
                         },
                         new
                         {
-                            Id = "d99764db-a6f6-47a4-8e36-c1d8f79e851c",
-                            ConcurrencyStamp = "ddebf4b0-be0b-4d38-841c-62539329e8d8",
+                            Id = "86f1c3d7-b826-49f4-8831-92f4947af566",
+                            ConcurrencyStamp = "100f2828-69ad-4715-a7b9-000c2f4a4d24",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         });
@@ -249,6 +249,9 @@ namespace TrashCollectorProj.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("HasExtraPickup")
+                        .HasColumnType("bit");
+
                     b.Property<string>("IdentityUserId")
                         .HasColumnType("nvarchar(450)");
 
@@ -265,9 +268,8 @@ namespace TrashCollectorProj.Migrations
                     b.Property<int>("PhoneNumber")
                         .HasColumnType("int");
 
-                    b.Property<string>("PickupDay")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("PickupDay")
+                        .HasColumnType("int");
 
                     b.Property<string>("State")
                         .IsRequired()

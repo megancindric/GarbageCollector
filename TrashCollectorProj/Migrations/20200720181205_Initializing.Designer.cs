@@ -10,8 +10,8 @@ using TrashCollectorProj.Data;
 namespace TrashCollectorProj.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200717205853_UpdateToCustomer")]
-    partial class UpdateToCustomer
+    [Migration("20200720181205_Initializing")]
+    partial class Initializing
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -50,15 +50,15 @@ namespace TrashCollectorProj.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "bb7ae760-703f-4299-84df-bdf7fdd35872",
-                            ConcurrencyStamp = "c2d9fd5f-c042-4389-911c-d6d24d2ac0e4",
+                            Id = "5e8525e4-a4e0-4ad3-a031-2697b7217d31",
+                            ConcurrencyStamp = "7fe7b69a-5f0e-4b04-8205-a8d500d87b43",
                             Name = "Employee",
                             NormalizedName = "EMPLOYEE"
                         },
                         new
                         {
-                            Id = "96e02cc7-8ad0-4805-8b48-1a1dd08a507f",
-                            ConcurrencyStamp = "65c32228-a88e-423d-8127-0c4156ffa147",
+                            Id = "86f1c3d7-b826-49f4-8831-92f4947af566",
+                            ConcurrencyStamp = "100f2828-69ad-4715-a7b9-000c2f4a4d24",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         });
@@ -244,9 +244,15 @@ namespace TrashCollectorProj.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("ExtraPickupDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("HasExtraPickup")
+                        .HasColumnType("bit");
 
                     b.Property<string>("IdentityUserId")
                         .HasColumnType("nvarchar(450)");
@@ -258,12 +264,14 @@ namespace TrashCollectorProj.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("LastPickupDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("PhoneNumber")
                         .HasColumnType("int");
 
-                    b.Property<string>("PickupDay")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("PickupDay")
+                        .HasColumnType("int");
 
                     b.Property<string>("State")
                         .IsRequired()
@@ -272,6 +280,15 @@ namespace TrashCollectorProj.Migrations
                     b.Property<string>("StreetName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("SuspendedEndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("SuspendedStartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("TrashFees")
+                        .HasColumnType("float");
 
                     b.Property<int>("ZipCode")
                         .HasColumnType("int");

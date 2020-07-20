@@ -79,6 +79,7 @@ namespace TrashCollectorProj.Controllers
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 customer.IdentityUserId = userId;
                 customer.IsSuspended = false;
+                customer.HasExtraPickup = false;
                 customer.TrashFees = 0;
                 _context.Add(customer);
                 await _context.SaveChangesAsync();
@@ -284,6 +285,7 @@ namespace TrashCollectorProj.Controllers
             {
                 try
                 {
+                    customer.HasExtraPickup = true;
                     _context.Update(customer);
                     await _context.SaveChangesAsync();
                 }

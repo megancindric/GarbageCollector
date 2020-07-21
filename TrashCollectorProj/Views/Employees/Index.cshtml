@@ -43,9 +43,6 @@
                 @Html.DisplayNameFor(model => model.Customers[0].LastPickupDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Customers[0].HasExtraPickup)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.Customers[0].ExtraPickupDate)
             </th>
             <th></th>
@@ -79,7 +76,7 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.LastPickupDate)
                 </td>
-                @if (item.HasExtraPickup)
+                @if (item.ExtraPickupDate != default)
                 {
                     <td>
                         @Html.DisplayFor(modelItem => item.ExtraPickupDate.Date)

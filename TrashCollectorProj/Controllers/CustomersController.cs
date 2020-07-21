@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -194,7 +195,6 @@ namespace TrashCollectorProj.Controllers
             {
                 try
                 {
-                    customerToUpdate.HasExtraPickup = true;
                     customerToUpdate.ExtraPickupDate = customer.ExtraPickupDate;
                     _context.SaveChanges();
                     return RedirectToAction(nameof(Index));
@@ -278,5 +278,7 @@ namespace TrashCollectorProj.Controllers
         {
             return _context.Customers.Any(e => e.Id == id);
         }
+
+       
     }
 }

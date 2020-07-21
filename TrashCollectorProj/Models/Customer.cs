@@ -37,19 +37,15 @@ namespace TrashCollectorProj.Models
         public int ZipCode { get; set; }
         public DateTime LastPickupDate { get; set; }
         public double TrashFees { get; set; }
-        public bool IsSuspended { get; set; }
 
         public DateTime SuspendedStartDate { get; set; }
 
         public DateTime SuspendedEndDate { get; set; }
-        public bool HasExtraPickup { get; set; }
 
         public DateTime ExtraPickupDate { get; set; }
 
         public Customer()
         {
-            IsSuspended = false;
-            HasExtraPickup = false;
             LastPickupDate = default;
             ExtraPickupDate = default;
             SuspendedStartDate = default;

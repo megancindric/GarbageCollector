@@ -175,7 +175,8 @@ namespace TrashCollectorProj.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode")] Customer customer)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode,LastPickupDate,TrashFees,IsSuspended,SuspendedStartDate,SuspendedEndDate,ExtraPickupDate")]
+ Customer customer)
         {
             if (id != customer.Id)
             {
@@ -207,7 +208,7 @@ namespace TrashCollectorProj.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPickupDay(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode")] Customer customer)
+        public async Task<IActionResult> EditPickupDay(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode,LastPickupDate,TrashFees,IsSuspended,SuspendedStartDate,SuspendedEndDate,ExtraPickupDate")] Customer customer)
         {
             if (id != customer.Id)
             {
@@ -240,7 +241,8 @@ namespace TrashCollectorProj.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> MakePayment(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode")] Customer customer)
+        public async Task<IActionResult> MakePayment(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode,LastPickupDate,TrashFees,IsSuspended,SuspendedStartDate,SuspendedEndDate,ExtraPickupDate")]
+ Customer customer)
         {
             if (id != customer.Id)
             {
@@ -275,7 +277,7 @@ namespace TrashCollectorProj.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ScheduleExtraPickup(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode")] Customer customer)
+        public async Task<IActionResult> ScheduleExtraPickup(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode,LastPickupDate,TrashFees,IsSuspended,SuspendedStartDate,SuspendedEndDate,ExtraPickupDate")] Customer customer)
         {
             if (id != customer.Id)
             {
@@ -308,7 +310,7 @@ namespace TrashCollectorProj.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SuspendService(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode")] Customer customer)
+        public async Task<IActionResult> SuspendService(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode,LastPickupDate,TrashFees,IsSuspended,SuspendedStartDate,SuspendedEndDate,ExtraPickupDate")] Customer customer)
         {
             if (id != customer.Id)
             {

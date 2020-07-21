@@ -7,7 +7,7 @@
 
 <h1>Temporarily Suspend your Service</h1>
 
-<h4>Suspend your Service, or cancel your current suspension of service</h4>
+<h4>Suspend your Service using the selector below</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -24,23 +24,6 @@
                 <label asp-for="SuspendedEndDate" class="control-label"></label>
                 <input asp-for="SuspendedEndDate" class="form-control" />
                 <span asp-validation-for="SuspendedEndDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="SuspendService">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsSuspended" /> @Html.DisplayNameFor(model => model.IsSuspended)
-                </label>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

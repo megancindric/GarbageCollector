@@ -23,12 +23,24 @@ namespace TrashCollectorProj.Controllers
         }
 
         // GET: Employees
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            //NOTE for filtering later in the project - create index post method to filter customers by date
-            string currentDay = DateTime.Now.DayOfWeek.ToString();
-            var applicationDbContext = _context.Customer.Where(m => m.IsSuspended == false);
-            return View(await applicationDbContext.ToListAsync());
+            ViewData["CurrentFilter"] = searchString;
+            DayOfWeek currentDay = DateTime.Now.DayOfWeek;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                var searchStringAsDay = (DayOfWeek)Enum.Parse(typeof(DayOfWeek), searchString);
+
+                var applicationDbContext = _context.Customer.Where(s => s.IsSuspended == false && s.PickupDay == searchStringAsDay);
+                return View(await applicationDbContext.ToListAsync());
+
+            }
+            else
+            {
+                var applicationDbContext = _context.Customer.Where(m => m.IsSuspended == false && m.PickupDay == currentDay);
+                return View(await applicationDbContext.ToListAsync());
+
+            }
         }
 
         // GET: Employees/Details/5
@@ -62,7 +74,7 @@ namespace TrashCollectorProj.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,IdentityUserId,FirstName,LastName")] Employee employee)
+        public async Task<IActionResult> Create([Bind("Id,IdentityUserId,FirstName,LastName,ZipCode")] Employee employee)
         {
             if (ModelState.IsValid)
             {
@@ -114,7 +126,7 @@ namespace TrashCollectorProj.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,IdentityUserId,FirstName,LastName")] Employee employee)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,IdentityUserId,FirstName,LastName,ZipCode")] Employee employee)
         {
             if (id != employee.Id)
             {
@@ -147,7 +159,8 @@ namespace TrashCollectorProj.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ConfirmPickup(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode")] Customer customer)
+        public async Task<IActionResult> ConfirmPickup(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode,LastPickupDate,TrashFees,IsSuspended,SuspendedStartDate,SuspendedEndDate,ExtraPickupDate")]
+ Customer customer)
         {
             if (id != customer.Id)
             {
@@ -166,6 +179,7 @@ namespace TrashCollectorProj.Controllers
                         customer.ExtraPickupDate = default(DateTime);
                         _context.Update(customer);
                         await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
                     }
                     catch (DbUpdateConcurrencyException)
                     {
@@ -187,6 +201,7 @@ namespace TrashCollectorProj.Controllers
                         customer.TrashFees += 30;
                         _context.Update(customer);
                         await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
                     }
                     catch (DbUpdateConcurrencyException)
                     {
@@ -201,7 +216,6 @@ namespace TrashCollectorProj.Controllers
                     }
                 }
                
-                return RedirectToAction(nameof(Index));
             }
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
             return View(customer);

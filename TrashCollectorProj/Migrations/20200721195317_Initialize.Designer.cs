@@ -10,8 +10,8 @@ using TrashCollectorProj.Data;
 namespace TrashCollectorProj.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200721180538_FixingNameOfRoles")]
-    partial class FixingNameOfRoles
+    [Migration("20200721195317_Initialize")]
+    partial class Initialize
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -50,15 +50,15 @@ namespace TrashCollectorProj.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "ea7026dd-115e-45d0-9141-c8f10c17ee6b",
-                            ConcurrencyStamp = "1554ec9a-0c5e-45ac-aeaf-11cefe99d159",
+                            Id = "7d5a7da7-f1b0-42f8-9cd8-166bd860763d",
+                            ConcurrencyStamp = "3177b830-a845-4e95-9e6b-afbe4b5bbee2",
                             Name = "Employee",
                             NormalizedName = "EMPLOYEE"
                         },
                         new
                         {
-                            Id = "c6de5423-4c68-44c5-b6b2-ccb6a456673d",
-                            ConcurrencyStamp = "bacc9723-633e-4f25-b549-9125870e266c",
+                            Id = "1319fffd-86d3-49b9-9c3d-9ffdd9c80dec",
+                            ConcurrencyStamp = "c6b1ea6f-dce3-4693-bbcc-5232371787f9",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         });
@@ -281,10 +281,10 @@ namespace TrashCollectorProj.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("SuspendedEndDate")
+                    b.Property<DateTime>("SuspendedEndDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("SuspendedStartDate")
+                    b.Property<DateTime>("SuspendedStartDate")
                         .HasColumnType("datetime2");
 
                     b.Property<double>("TrashFees")

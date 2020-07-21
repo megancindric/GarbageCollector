@@ -39,16 +39,23 @@ namespace TrashCollectorProj.Models
         public double TrashFees { get; set; }
         public bool IsSuspended { get; set; }
 
-        [DataType(DataType.Date)]
-        public Nullable<DateTime> SuspendedStartDate { get; set; }
+        public DateTime SuspendedStartDate { get; set; }
 
-        [DataType(DataType.Date)]
-        public Nullable<DateTime> SuspendedEndDate { get; set; }
+        public DateTime SuspendedEndDate { get; set; }
         public bool HasExtraPickup { get; set; }
 
-        [DataType(DataType.Date)]
         public DateTime ExtraPickupDate { get; set; }
 
+        public Customer()
+        {
+            IsSuspended = false;
+            HasExtraPickup = false;
+            LastPickupDate = default;
+            ExtraPickupDate = default;
+            SuspendedStartDate = default;
+            SuspendedEndDate = default;
+            TrashFees = 0;
+        }
 
     }
 }

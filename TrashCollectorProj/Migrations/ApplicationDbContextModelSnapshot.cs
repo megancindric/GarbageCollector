@@ -48,15 +48,15 @@ namespace TrashCollectorProj.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "ea7026dd-115e-45d0-9141-c8f10c17ee6b",
-                            ConcurrencyStamp = "1554ec9a-0c5e-45ac-aeaf-11cefe99d159",
+                            Id = "60546f49-9438-4b74-8cd3-ccc4e24df535",
+                            ConcurrencyStamp = "12776c32-131a-4e0b-a59a-c790c4830833",
                             Name = "Employee",
                             NormalizedName = "EMPLOYEE"
                         },
                         new
                         {
-                            Id = "c6de5423-4c68-44c5-b6b2-ccb6a456673d",
-                            ConcurrencyStamp = "bacc9723-633e-4f25-b549-9125870e266c",
+                            Id = "bce9e720-0a1c-4642-bc0e-499948d858d4",
+                            ConcurrencyStamp = "0754951b-3629-4c92-999e-9f723459ef5a",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         });
@@ -279,10 +279,10 @@ namespace TrashCollectorProj.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("SuspendedEndDate")
+                    b.Property<DateTime>("SuspendedEndDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("SuspendedStartDate")
+                    b.Property<DateTime>("SuspendedStartDate")
                         .HasColumnType("datetime2");
 
                     b.Property<double>("TrashFees")

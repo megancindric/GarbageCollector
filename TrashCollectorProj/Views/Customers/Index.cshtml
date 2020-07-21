@@ -68,10 +68,23 @@
     </dl>
 </div>
 <div>
+    <h4>Extra Pickups</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            "Extra Pickup Date"
+        </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.ExtraPickupDate.Date)
+            </dd>
+    </dl>
+    <a asp-action="ScheduleExtraPickup">Schedule a 1-Time Extra Pickup</a>
+</div>
+<div>
     <a asp-action="Edit">Edit User Profile</a> |
     <a asp-action="EditPickupDay">Change Scheduled Pickup Day</a>
     <a asp-action="MakePayment">Pay Your Trash Fees</a>
-    <a asp-action="ScheduleExtraPickup">Schedule a 1-Time Extra Pickup</a>
+    
     <a asp-action="SuspendService">Temporarily Suspend Service</a>
 
 </div>

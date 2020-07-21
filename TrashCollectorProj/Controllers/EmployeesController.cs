@@ -65,7 +65,7 @@ namespace TrashCollectorProj.Controllers
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 employee.IdentityUserId = userId;
                 _context.Add(employee);
-                await _context.SaveChangesAsync();
+                _context.SaveChanges();
                 return RedirectToAction(nameof(Index));
             }
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", employee.IdentityUserId);
@@ -125,7 +125,7 @@ namespace TrashCollectorProj.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,IdentityUserId,FirstName,LastName,ZipCode")] Employee employee)
+        public async Task<IActionResult> Edit(int id, Employee employee)
         {
             if (id != employee.Id)
             {
@@ -137,7 +137,8 @@ namespace TrashCollectorProj.Controllers
                 try
                 {
                     _context.Update(employee);
-                    await _context.SaveChangesAsync();
+                    _context.SaveChanges();
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -158,8 +159,7 @@ namespace TrashCollectorProj.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ConfirmPickup(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode,LastPickupDate,TrashFees,IsSuspended,SuspendedStartDate,SuspendedEndDate,ExtraPickupDate")]
- Customer customer)
+        public async Task<IActionResult> ConfirmPickup(int id, Customer customer)
         {
             if (id != customer.Id)
             {
@@ -173,10 +173,9 @@ namespace TrashCollectorProj.Controllers
                     customer.LastPickupDate = DateTime.UtcNow;
                     customer.TrashFees += 30;
                     _context.Update(customer);
-                    await _context.SaveChangesAsync();
-                    customer.HasExtraPickup = false;
-                    customer.ExtraPickupDate = default(DateTime);
-                    }
+                    _context.SaveChanges();
+                    return RedirectToAction(nameof(Index));
+                }
                     catch (DbUpdateConcurrencyException)
                     {
                         if (!CustomerExists(customer.Id))
@@ -188,7 +187,6 @@ namespace TrashCollectorProj.Controllers
                             throw;
                         }
                     }              
-                return RedirectToAction(nameof(Index));
             }
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
             return View(customer);
@@ -214,8 +212,9 @@ namespace TrashCollectorProj.Controllers
                         customer.LastPickupDate = DateTime.UtcNow;
                         customer.TrashFees += 30;
                         _context.Update(customer);
-                        await _context.SaveChangesAsync();
-                     }
+                    _context.SaveChanges();
+                    return RedirectToAction(nameof(Index));
+                }
                     catch (DbUpdateConcurrencyException)
                     {
                         if (!CustomerExists(customer.Id))
@@ -227,7 +226,6 @@ namespace TrashCollectorProj.Controllers
                             throw;
                         }
                     }
-                return RedirectToAction(nameof(Index));
             }
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
             return View(customer);
@@ -277,7 +275,7 @@ namespace TrashCollectorProj.Controllers
         {
             var employee = await _context.Employees.FindAsync(id);
             _context.Employees.Remove(employee);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
 
@@ -297,7 +295,7 @@ namespace TrashCollectorProj.Controllers
         {
             var customer = await _context.Customers.FindAsync(id);
             _context.Customers.Remove(customer);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
 

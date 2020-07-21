@@ -24,7 +24,7 @@ namespace TrashCollectorProj.Controllers
         public IActionResult Index()
         {
 
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
 
             return View(customer);
@@ -32,14 +32,14 @@ namespace TrashCollectorProj.Controllers
 
 
         // GET: Customers/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public IActionResult Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var customer = await _context.Customers
+            var customer = _context.Customers
                 .Include(c => c.IdentityUser)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (customer == null)
@@ -62,18 +62,15 @@ namespace TrashCollectorProj.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode,IsSuspended")] Customer customer)
+        public IActionResult Create([Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode")]Customer customer)
         {
             if (ModelState.IsValid)
             {
    
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 customer.IdentityUserId = userId;
-                customer.IsSuspended = false;
-                customer.HasExtraPickup = false;
-                customer.TrashFees = 0;
                 _context.Add(customer);
-                await _context.SaveChangesAsync();
+                _context.SaveChanges();
                 return RedirectToAction(nameof(Index));
 
             }
@@ -82,22 +79,14 @@ namespace TrashCollectorProj.Controllers
         }
 
         // GET: Customers/Edit/5
-        public async Task<IActionResult> Edit()
+        public ActionResult Edit()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
 
             return View(customer);
         }
-        public async Task<IActionResult> EditPickupDay()
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var customer = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
-
-            return View(customer);
-        }
-
-        public async Task<IActionResult> MakePayment()
+        public ActionResult EditPickupDay()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
@@ -105,7 +94,7 @@ namespace TrashCollectorProj.Controllers
             return View(customer);
         }
 
-        public async Task<IActionResult> ScheduleExtraPickup()
+        public ActionResult MakePayment()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
@@ -113,7 +102,15 @@ namespace TrashCollectorProj.Controllers
             return View(customer);
         }
 
-        public async Task<IActionResult> SuspendService()
+        public ActionResult ScheduleExtraPickup()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var customer = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+
+            return View(customer);
+        }
+
+        public ActionResult SuspendService()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
@@ -125,20 +122,50 @@ namespace TrashCollectorProj.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode,LastPickupDate,TrashFees,IsSuspended,SuspendedStartDate,SuspendedEndDate,ExtraPickupDate")]
- Customer customer)
+        public ActionResult Edit(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,StreetName,City,State,ZipCode")] Customer customer)
         {
-            if (id != customer.Id)
-            {
-                return NotFound();
-            }
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(customer);
-                    await _context.SaveChangesAsync();
+                    var thisUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                    customer.IdentityUserId = thisUserId;
+                    _context.Customers.Update(customer);
+                    _context.SaveChanges();
+                }
+                catch
+                {
+                    return View();
+                }
+                return RedirectToAction("Index");
+            }
+            return View(customer);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult EditPickupDay(int id, [Bind("PickupDay")] Customer customer)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var customerToUpdate = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault(); 
+            customerToUpdate.PickupDay = customer.PickupDay;
+            _context.SaveChanges();
+                return RedirectToAction(nameof(Index));
+           
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult MakePayment(int id, [Bind("TrashFees")] Customer customer)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var customerToUpdate = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    customerToUpdate.TrashFees -= customer.TrashFees;
+                    _context.SaveChanges();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -159,19 +186,18 @@ namespace TrashCollectorProj.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPickupDay(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode,LastPickupDate,TrashFees,IsSuspended,SuspendedStartDate,SuspendedEndDate,ExtraPickupDate")] Customer customer)
+        public ActionResult ScheduleExtraPickup(int id, [Bind("HasExtraPickup,ExtraPickupDate")] Customer customer)
         {
-            if (id != customer.Id)
-            {
-                return NotFound();
-            }
-
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var customerToUpdate = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault(); 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(customer);
-                    await _context.SaveChangesAsync();
+                    customerToUpdate.HasExtraPickup = true;
+                    customerToUpdate.ExtraPickupDate = customer.ExtraPickupDate;
+                    _context.SaveChanges();
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -184,30 +210,23 @@ namespace TrashCollectorProj.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
             return View(customer);
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> MakePayment(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode,LastPickupDate,TrashFees,IsSuspended,SuspendedStartDate,SuspendedEndDate,ExtraPickupDate")]
- Customer customer)
+        public ActionResult SuspendService(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode,LastPickupDate,TrashFees,IsSuspended,SuspendedStartDate,SuspendedEndDate,HasExtraPickup,ExtraPickupDate")] Customer customer)
         {
-            if (id != customer.Id)
-            {
-                return NotFound();
-            }
-            var currentPerson = _context.Customers.FirstOrDefault(p => p.Id == id);
-
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var customerToUpdate = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
             if (ModelState.IsValid)
             {
                 try
                 {
-                    customer.TrashFees = currentPerson.TrashFees - customer.TrashFees;
-                    _context.Update(customer);
-                    await _context.SaveChangesAsync();
+                    customerToUpdate.SuspendedStartDate = customer.SuspendedStartDate;
+                    customerToUpdate.SuspendedEndDate = customer.SuspendedEndDate;
+                    _context.SaveChanges();
+                    return RedirectToAction("Index");
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -220,86 +239,20 @@ namespace TrashCollectorProj.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
-            return View(customer);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ScheduleExtraPickup(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode,LastPickupDate,TrashFees,IsSuspended,SuspendedStartDate,SuspendedEndDate,ExtraPickupDate")] Customer customer)
-        {
-            if (id != customer.Id)
-            {
-                return NotFound();
-            }
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    customer.HasExtraPickup = true;
-                    _context.Update(customer);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CustomerExists(customer.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
-            return View(customer);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SuspendService(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode,LastPickupDate,TrashFees,IsSuspended,SuspendedStartDate,SuspendedEndDate,ExtraPickupDate")] Customer customer)
-        {
-            if (id != customer.Id)
-            {
-                return NotFound();
-            }
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(customer);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CustomerExists(customer.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
             }
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
             return View(customer);
         }
 
         // GET: Customers/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public ActionResult Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var customer = await _context.Customers
+            var customer = _context.Customers
                 .Include(c => c.IdentityUser)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (customer == null)
@@ -313,11 +266,11 @@ namespace TrashCollectorProj.Controllers
         // POST: Customers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(int id)
+    public ActionResult DeleteConfirmed(int id)
         {
-            var customer = await _context.Customers.FindAsync(id);
+            var customer = _context.Customers.FirstOrDefault(m => m.Id == id);
             _context.Customers.Remove(customer);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
 

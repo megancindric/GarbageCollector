@@ -21,24 +21,15 @@ namespace TrashCollectorProj.Controllers
         }
 
         // GET: Customers
-        public async Task<IActionResult> Index(int? id)
+        public IActionResult Index()
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var customer = await _context.Customer
-                .Include(c => c.IdentityUser)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (customer == null)
-            {
-                return NotFound();
-            }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var customer = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
 
             return View(customer);
         }
-    
+
 
         // GET: Customers/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -48,7 +39,7 @@ namespace TrashCollectorProj.Controllers
                 return NotFound();
             }
 
-            var customer = await _context.Customer
+            var customer = await _context.Customers
                 .Include(c => c.IdentityUser)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (customer == null)
@@ -91,82 +82,42 @@ namespace TrashCollectorProj.Controllers
         }
 
         // GET: Customers/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit()
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var customer = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
 
-            var customer = await _context.Customer.FindAsync(id);
-            if (customer == null)
-            {
-                return NotFound();
-            }
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
             return View(customer);
         }
-        public async Task<IActionResult> EditPickupDay(int? id)
+        public async Task<IActionResult> EditPickupDay()
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var customer = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
 
-            var customer = await _context.Customer.FindAsync(id);
-            if (customer == null)
-            {
-                return NotFound();
-            }
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
             return View(customer);
         }
 
-        public async Task<IActionResult> MakePayment(int? id)
+        public async Task<IActionResult> MakePayment()
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var customer = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
 
-            var customer = await _context.Customer.FindAsync(id);
-            if (customer == null)
-            {
-                return NotFound();
-            }
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
             return View(customer);
         }
 
-        public async Task<IActionResult> ScheduleExtraPickup(int? id)
+        public async Task<IActionResult> ScheduleExtraPickup()
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var customer = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
 
-            var customer = await _context.Customer.FindAsync(id);
-            if (customer == null)
-            {
-                return NotFound();
-            }
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
             return View(customer);
         }
 
-        public async Task<IActionResult> SuspendService(int? id)
+        public async Task<IActionResult> SuspendService()
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var customer = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
 
-            var customer = await _context.Customer.FindAsync(id);
-            if (customer == null)
-            {
-                return NotFound();
-            }
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
             return View(customer);
         }
 
@@ -248,7 +199,7 @@ namespace TrashCollectorProj.Controllers
             {
                 return NotFound();
             }
-            var currentPerson = _context.Customer.FirstOrDefault(p => p.Id == id);
+            var currentPerson = _context.Customers.FirstOrDefault(p => p.Id == id);
 
             if (ModelState.IsValid)
             {
@@ -348,7 +299,7 @@ namespace TrashCollectorProj.Controllers
                 return NotFound();
             }
 
-            var customer = await _context.Customer
+            var customer = await _context.Customers
                 .Include(c => c.IdentityUser)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (customer == null)
@@ -364,15 +315,15 @@ namespace TrashCollectorProj.Controllers
         [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var customer = await _context.Customer.FindAsync(id);
-            _context.Customer.Remove(customer);
+            var customer = await _context.Customers.FindAsync(id);
+            _context.Customers.Remove(customer);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool CustomerExists(int id)
         {
-            return _context.Customer.Any(e => e.Id == id);
+            return _context.Customers.Any(e => e.Id == id);
         }
     }
 }

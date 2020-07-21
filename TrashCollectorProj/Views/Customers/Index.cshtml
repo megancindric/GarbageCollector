@@ -42,13 +42,13 @@
             @Html.DisplayFor(model => model.StreetName)
         </dd>
         <dt class="col-sm-2">
-           "City"
+            "City"
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.City)
         </dd>
         <dt class="col-sm-2">
-           "State"
+            "State"
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.State)
@@ -59,11 +59,17 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.ZipCode)
         </dd>
+        <dt class="col-sm-2">
+            "Current Trash Fees"
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TrashFees)
+        </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit User Profile</a> |
-    <a asp-action="EditPickupDate" asp-route-id="@Model.Id">Change Scheduled Pickup Day</a>
+    <a asp-action="Edit">Edit User Profile</a> |
+    <a asp-action="EditPickupDay">Change Scheduled Pickup Day</a>
     <a asp-action="MakePayment">Pay Your Trash Fees</a>
     <a asp-action="ScheduleExtraPickup">Schedule a 1-Time Extra Pickup</a>
     <a asp-action="SuspendService">Temporarily Suspend Service</a>

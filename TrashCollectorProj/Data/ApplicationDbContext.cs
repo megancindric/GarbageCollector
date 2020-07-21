@@ -33,9 +33,9 @@ namespace TrashCollectorProj.Data
             );
         }
 
-        public DbSet<TrashCollectorProj.Models.Customer> Customer { get; set; }
+        public DbSet<TrashCollectorProj.Models.Customer> Customers { get; set; }
 
-        public DbSet<TrashCollectorProj.Models.Employee> Employee { get; set; }
+        public DbSet<TrashCollectorProj.Models.Employee> Employees { get; set; }
     }
 }
 

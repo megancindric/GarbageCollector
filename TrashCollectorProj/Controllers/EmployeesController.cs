@@ -23,44 +23,28 @@ namespace TrashCollectorProj.Controllers
         }
 
         // GET: Employees
-        public async Task<IActionResult> Index(string searchString)
+        public async Task<IActionResult> Index()
         {
-            ViewData["CurrentFilter"] = searchString;
-            DayOfWeek currentDay = DateTime.Now.DayOfWeek;
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                var searchStringAsDay = (DayOfWeek)Enum.Parse(typeof(DayOfWeek), searchString);
+            EmployeeIndexViewModel viewModel = new EmployeeIndexViewModel();
+            viewModel.DayOfWeekList = new SelectList(Enum.GetValues(typeof(DayOfWeek)));
+            viewModel.SelectedDay = DateTime.Now.DayOfWeek;
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var employee = _context.Employees.Where(c => c.IdentityUserId == userId);
+            viewModel.Customers = _context.Customers.Where(s => s.IsSuspended == false && (s.PickupDay == viewModel.SelectedDay || s.ExtraPickupDate.DayOfWeek == viewModel.SelectedDay)).ToList();
+            return View(viewModel.Customers);
 
-                var applicationDbContext = _context.Customer.Where(s => s.IsSuspended == false && s.PickupDay == searchStringAsDay);
-                return View(await applicationDbContext.ToListAsync());
-
-            }
-            else
-            {
-                var applicationDbContext = _context.Customer.Where(m => m.IsSuspended == false && m.PickupDay == currentDay);
-                return View(await applicationDbContext.ToListAsync());
-
-            }
         }
 
-        // GET: Employees/Details/5
-        public async Task<IActionResult> Details(int? id)
+        [HttpPost]
+        public async Task<IActionResult> Index(EmployeeIndexViewModel viewModel)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var employee = await _context.Employee
-                .Include(e => e.IdentityUser)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (employee == null)
-            {
-                return NotFound();
-            }
-
-            return View(employee);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var employee = _context.Employees.Where(c => c.IdentityUserId == userId);
+            viewModel.Customers = _context.Customers.Where(s => s.IsSuspended == false && (s.PickupDay == viewModel.SelectedDay || s.ExtraPickupDate.DayOfWeek == viewModel.SelectedDay)).ToList();
+            return View(viewModel.Customers);
         }
+
+    
 
         // GET: Employees/Create
         public IActionResult Create()
@@ -96,7 +80,7 @@ namespace TrashCollectorProj.Controllers
                 return NotFound();
             }
 
-            var employee = await _context.Employee.FindAsync(id);
+            var employee = await _context.Employees.FindAsync(id);
             if (employee == null)
             {
                 return NotFound();
@@ -112,7 +96,7 @@ namespace TrashCollectorProj.Controllers
                 return NotFound();
             }
 
-            var customer = await _context.Customer.FindAsync(id);
+            var customer = await _context.Customers.FindAsync(id);
             if (customer == null)
             {
                 return NotFound();
@@ -127,7 +111,7 @@ namespace TrashCollectorProj.Controllers
                 return NotFound();
             }
 
-            var customer = await _context.Customer.FindAsync(id);
+            var customer = await _context.Customers.FindAsync(id);
             if (customer == null)
             {
                 return NotFound();
@@ -257,7 +241,7 @@ namespace TrashCollectorProj.Controllers
                 return NotFound();
             }
 
-            var employee = await _context.Employee
+            var employee = await _context.Employees
                 .Include(e => e.IdentityUser)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (employee == null)
@@ -275,7 +259,7 @@ namespace TrashCollectorProj.Controllers
                 return NotFound();
             }
 
-            var customer = await _context.Customer
+            var customer = await _context.Customers
                 .Include(e => e.IdentityUser)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (customer == null)
@@ -291,28 +275,28 @@ namespace TrashCollectorProj.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var employee = await _context.Employee.FindAsync(id);
-            _context.Employee.Remove(employee);
+            var employee = await _context.Employees.FindAsync(id);
+            _context.Employees.Remove(employee);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool EmployeeExists(int id)
         {
-            return _context.Employee.Any(e => e.Id == id);
+            return _context.Employees.Any(e => e.Id == id);
         }
 
         private bool CustomerExists(int id)
         {
-            return _context.Customer.Any(e => e.Id == id);
+            return _context.Customers.Any(e => e.Id == id);
         }
 
         [HttpPost, ActionName("DeleteCustomer")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteCustomerConfirmed(int id)
         {
-            var customer = await _context.Customer.FindAsync(id);
-            _context.Customer.Remove(customer);
+            var customer = await _context.Customers.FindAsync(id);
+            _context.Customers.Remove(customer);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

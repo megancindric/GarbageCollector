@@ -120,6 +120,21 @@ namespace TrashCollectorProj.Controllers
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
             return View(customer);
         }
+        public async Task<IActionResult> ConfirmExtraPickup(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var customer = await _context.Customer.FindAsync(id);
+            if (customer == null)
+            {
+                return NotFound();
+            }
+            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
+            return View(customer);
+        }
 
         // POST: Employees/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
@@ -169,40 +184,54 @@ namespace TrashCollectorProj.Controllers
 
             if (ModelState.IsValid)
             {
-                if(customer.HasExtraPickup == true)
-                {
                     try
                     {
-                        customer.LastPickupDate = DateTime.UtcNow;
-                        customer.TrashFees += 30;
+                    customer.LastPickupDate = DateTime.UtcNow;
+                    customer.TrashFees += 30;
+                    _context.Update(customer);
+                    await _context.SaveChangesAsync();
+                    customer.HasExtraPickup = false;
+                    customer.ExtraPickupDate = default(DateTime);
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!CustomerExists(customer.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }              
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
+            return View(customer);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmExtraPickup(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode,LastPickupDate,TrashFees,IsSuspended,SuspendedStartDate,SuspendedEndDate,ExtraPickupDate")]
+ Customer customer)
+        {
+            if (id != customer.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+            
+                    try
+                    {
                         customer.HasExtraPickup = false;
                         customer.ExtraPickupDate = default(DateTime);
-                        _context.Update(customer);
-                        await _context.SaveChangesAsync();
-                        return RedirectToAction(nameof(Index));
-                    }
-                    catch (DbUpdateConcurrencyException)
-                    {
-                        if (!CustomerExists(customer.Id))
-                        {
-                            return NotFound();
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
-                }
-                else
-                {
-                    try
-                    {
                         customer.LastPickupDate = DateTime.UtcNow;
                         customer.TrashFees += 30;
                         _context.Update(customer);
                         await _context.SaveChangesAsync();
-                        return RedirectToAction(nameof(Index));
-                    }
+                     }
                     catch (DbUpdateConcurrencyException)
                     {
                         if (!CustomerExists(customer.Id))
@@ -214,8 +243,7 @@ namespace TrashCollectorProj.Controllers
                             throw;
                         }
                     }
-                }
-               
+                return RedirectToAction(nameof(Index));
             }
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
             return View(customer);

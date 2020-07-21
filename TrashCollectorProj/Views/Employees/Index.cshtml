@@ -25,9 +25,6 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.LastPickupDate)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.PickupDay)
             </th>
             <th>
@@ -48,6 +45,15 @@
             <th>
                 @Html.DisplayNameFor(model => model.ZipCode)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LastPickupDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HasExtraPickup)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ExtraPickupDate)
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -55,9 +61,6 @@
         @foreach (var item in Model)
         {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ExtraPickupDate)
-            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.PickupDay)
             </td>
@@ -80,39 +83,31 @@
                 @Html.DisplayFor(modelItem => item.ZipCode)
             </td>
             <td>
+                @Html.DisplayFor(modelItem => item.LastPickupDate)
+            </td>
+            @if (item.HasExtraPickup)
+            {
+                <td>
+                    @Html.DisplayFor(modelItem => item.ExtraPickupDate)
+                </td>
+                <td>
+                    <a asp-action="ConfirmExtraPickup" asp-route-id="@item.Id">Confirm this Extra Pickup</a>
+                </td>
+            }
+            else
+            {
+                <td>
+                   No additional pickups scheduled at this time.
+                </td>
+                <td>
+                </td>
+            }
+            <td>
                 <a asp-action="ConfirmPickup" asp-route-id="@item.Id">Confirm this Pickup</a>
                 <a asp-action="DeleteCustomer" asp-route-id="@item.Id">Remove Customer [TESTING PURPOSES]</a>
             </td>
         </tr>
 
-            if (item.HasExtraPickup)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.ExtraPickupDate)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.FirstName)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.LastName)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.StreetName)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.City)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.State)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.ZipCode)
-                    </td>
-                    <td>
-                        <a asp-action="ConfirmPickup" asp-route-id="@item.Id">Confirm this Pickup</a>
-                    </td>
-                </tr>
             }
         }
     </tbody>

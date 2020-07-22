@@ -7,14 +7,17 @@
 
 <h1>Employee Dashboard</h1>
 
-<div class="form-group">
-    <input type="hidden" asp-for="SelectedDay" />
-    <label asp-for="SelectedDay" class="control-label"></label>
-    <select asp-for="SelectedDay" asp-items="@Model.DayOfWeekList" class="form-control"></select>
-    <span asp-validation-for="SelectedDay" class="text-danger"></span>
-</div>
-<div class="form-group">
-    <input type="submit" value="Filter By Day" class="btn btn-primary" />
+<div class="col-md-4">
+    <form asp-action="Index">
+        <div class="form-group">
+            <label asp-for="SelectedDay" class="control-label"></label>
+            <select asp-for="SelectedDay" asp-items="@Model.DayOfWeekList" class="form-control"></select>
+            <span asp-validation-for="SelectedDay" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Filter By Day" class="btn btn-info" />
+        </div>
+    </form>
 </div>
 
 <table class="table">

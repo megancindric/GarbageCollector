@@ -11,7 +11,7 @@ namespace TrashCollectorProj.Models
     {
         public List<Customer> Customers { get; set; }
 
-        public SelectList DayOfWeekList { get; set; }
+        public SelectList DayOfWeekList = new SelectList(new List<string>() { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" });
 
         public string SelectedDay { get; set; }
 

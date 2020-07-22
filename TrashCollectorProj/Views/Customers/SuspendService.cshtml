@@ -7,21 +7,20 @@
 
 <h1>Temporarily Suspend your Service</h1>
 
-<h4>Suspend your Service using the selector below</h4>
+<h4>Please enter your service suspension start and end dates (dd/mm/yyy format)</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="SuspendService">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
-            
             <div class="form-group">
-                <label asp-for="SuspendedStartDate" class="control-label"></label>
+                <label asp-for="SuspendedStartDate"></label>
                 <input asp-for="SuspendedStartDate" class="form-control" />
                 <span asp-validation-for="SuspendedStartDate" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="SuspendedEndDate" class="control-label"></label>
+                <label asp-for="SuspendedEndDate"></label>
                 <input asp-for="SuspendedEndDate" class="form-control" />
                 <span asp-validation-for="SuspendedEndDate" class="text-danger"></span>
             </div>

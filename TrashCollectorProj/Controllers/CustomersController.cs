@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Geocoding;
-using Geocoding.Google;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TrashCollectorProj.Data;
 using TrashCollectorProj.Models;
+using GoogleMapsGeocoding;
+using GoogleMapsGeocoding.Common;
 
 namespace TrashCollectorProj.Controllers
 {
@@ -27,20 +27,23 @@ namespace TrashCollectorProj.Controllers
         public IActionResult Index()
         {
 
-            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+            if (customer == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                return View(customer);
 
-            return View(customer);
+            }
         }
 
 
         // GET: Customers/Details/5
         public IActionResult Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
             var customer = _context.Customers
                 .Include(c => c.IdentityUser)
@@ -49,14 +52,16 @@ namespace TrashCollectorProj.Controllers
             {
                 return NotFound();
             }
+            else
+            {
+                return View(customer);
+            }
 
-            return View(customer);
         }
 
         // GET: Customers/Create
         public IActionResult Create()
         {
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id");
             return View();
         }
 
@@ -72,7 +77,7 @@ namespace TrashCollectorProj.Controllers
    
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 customer.IdentityUserId = userId;
-                GeocodeCustomerAsync(customer);
+                customer = GeocodeCustomer(customer);
                 _context.Add(customer);
                 _context.SaveChanges();
                 return RedirectToAction(nameof(Index));
@@ -98,19 +103,15 @@ namespace TrashCollectorProj.Controllers
             return View(customer);
         }
 
-        public ActionResult MakePayment()
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var customer = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
-
-            return View(customer);
-        }
 
         public ActionResult ScheduleExtraPickup()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
-
+            if (customer == null)
+            {
+                return NotFound();
+            }
             return View(customer);
         }
 
@@ -118,7 +119,10 @@ namespace TrashCollectorProj.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
-
+            if (customer == null)
+            {
+                return NotFound();
+            }
             return View(customer);
         }
 
@@ -134,6 +138,7 @@ namespace TrashCollectorProj.Controllers
                 {
                     var thisUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                     customer.IdentityUserId = thisUserId;
+                    customer = GeocodeCustomer(customer);
                     _context.Customers.Update(customer);
                     _context.SaveChanges();
                 }
@@ -154,43 +159,14 @@ namespace TrashCollectorProj.Controllers
             var customerToUpdate = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault(); 
             customerToUpdate.PickupDay = customer.PickupDay;
             _context.SaveChanges();
-                return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index));
            
         }
 
-        [HttpPost]
-        public ActionResult MakePayment(Customer customer)
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var customerToUpdate = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
-            var customerPayment = Convert.ToInt32(HttpContext.Request.Form["custPayment"].ToString());
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    customerToUpdate.TrashFees -= customerPayment;
-                    _context.SaveChanges();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CustomerExists(customer.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
-            return View(customer);
-        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult ScheduleExtraPickup(int id, [Bind("HasExtraPickup,ExtraPickupDate")] Customer customer)
+        public ActionResult ScheduleExtraPickup(int id, [Bind("ExtraPickupDate")] Customer customer)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customerToUpdate = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault(); 
@@ -282,14 +258,14 @@ namespace TrashCollectorProj.Controllers
         {
             return _context.Customers.Any(e => e.Id == id);
         }
-        public async Task<Customer> GeocodeCustomerAsync(Customer customer)
+        public Customer GeocodeCustomer(Customer customer)
         {
-            IGeocoder geocoder = new GoogleGeocoder() { ApiKey = "AIzaSyDYyltT3d7LeBJDgloGLVzGbNj4ndBOKa8" };
+            IGeocoder geocoder = new Geocoder("AIzaSyDYyltT3d7LeBJDgloGLVzGbNj4ndBOKa8");
 
             string addressString = customer.StreetName + " " + customer.City + " " + customer.State + " " + customer.ZipCode;
-            IEnumerable<Address> addressToGeocode = await geocoder.GeocodeAsync(addressString);
-            customer.Latitude = addressToGeocode.First().Coordinates.Latitude;
-            customer.Longitude = addressToGeocode.First().Coordinates.Longitude;
+            GeocodeResponse response = geocoder.Geocode(addressString);
+            customer.Latitude = response.Results[0].Geometry.Location.Lat;
+            customer.Longitude = response.Results[0].Geometry.Location.Lng;
             return customer;
 
         }

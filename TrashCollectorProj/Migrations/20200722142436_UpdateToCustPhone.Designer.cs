@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TrashCollectorProj.Data;
 
 namespace TrashCollectorProj.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200722142436_UpdateToCustPhone")]
+    partial class UpdateToCustPhone
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,15 +50,15 @@ namespace TrashCollectorProj.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "734eae08-4d71-4bdf-8657-0f15b4164f02",
-                            ConcurrencyStamp = "9821c8a5-3950-4730-9560-ac1b5b2d7131",
+                            Id = "d1dd560d-e353-4285-bda3-d71a0d2c8d1b",
+                            ConcurrencyStamp = "4da7461a-1205-435b-9ea9-bd902f0dd0bf",
                             Name = "Employee",
                             NormalizedName = "EMPLOYEE"
                         },
                         new
                         {
-                            Id = "e4754f3d-643e-404b-ab1b-6f90951d09ec",
-                            ConcurrencyStamp = "0e792310-d4f6-4bd6-9e00-488e0b4f61d8",
+                            Id = "17d76124-2271-4027-9bd5-d8ac6d708f15",
+                            ConcurrencyStamp = "b2abb19a-270a-4475-907d-d2c54a1b355c",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         });
@@ -265,9 +267,8 @@ namespace TrashCollectorProj.Migrations
                     b.Property<double>("Longitude")
                         .HasColumnType("float");
 
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(10)")
+                    b.Property<int>("PhoneNumber")
+                        .HasColumnType("int")
                         .HasMaxLength(10);
 
                     b.Property<string>("PickupDay")

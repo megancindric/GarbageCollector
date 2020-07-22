@@ -5,9 +5,10 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+
 <h1>Schedule an Extra Pickup</h1>
 
-<h4>Please enter the date of your 1-time extra pickup (We will convert this to a DatePicker form) </h4>
+<h4>Please enter the date of your 1-time extra pickup (Enter in dd/mm/yyyy format!) </h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -15,7 +16,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
-                <label asp-for="ExtraPickupDate" class="control-label"></label>
+                <label asp-for="ExtraPickupDate" class="control-label"Enter Extra Pickup Date></label>
                 <input asp-for="ExtraPickupDate" class="form-control" />
                 <span asp-validation-for="ExtraPickupDate" class="text-danger"></span>
             </div>
@@ -29,7 +30,6 @@
 <div>
     <a asp-action="Index">Back to Dashboard</a>
 </div>
-
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

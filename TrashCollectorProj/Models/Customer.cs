@@ -25,9 +25,9 @@ namespace TrashCollectorProj.Models
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
 
-        [Required, Phone]
+        [Required, MaxLength(10)]
         [Display(Name = "Phone Number")]
-        public int PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; }
 
         [Required]
         [Display(Name = "Regular Pickup Day")]

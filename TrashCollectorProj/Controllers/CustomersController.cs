@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -158,16 +159,16 @@ namespace TrashCollectorProj.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult MakePayment(int id, [Bind("TrashFees")] Customer customer)
+        public ActionResult MakePayment(Customer customer)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customerToUpdate = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+            var customerPayment = Convert.ToInt32(HttpContext.Request.Form["custPayment"].ToString());
             if (ModelState.IsValid)
             {
                 try
                 {
-                    customerToUpdate.TrashFees -= customer.TrashFees;
+                    customerToUpdate.TrashFees -= customerPayment;
                     _context.SaveChanges();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -199,7 +200,6 @@ namespace TrashCollectorProj.Controllers
                 {
                     customerToUpdate.ExtraPickupDate = customer.ExtraPickupDate;
                     _context.SaveChanges();
-                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -212,6 +212,8 @@ namespace TrashCollectorProj.Controllers
                         throw;
                     }
                 }
+                return RedirectToAction("Index");
+
             }
             return View(customer);
         }
@@ -284,7 +286,7 @@ namespace TrashCollectorProj.Controllers
         {
             IGeocoder geocoder = new GoogleGeocoder() { ApiKey = "AIzaSyDYyltT3d7LeBJDgloGLVzGbNj4ndBOKa8" };
 
-            string addressString = customer.StreetName + customer.City + customer.State + customer.ZipCode.ToString();
+            string addressString = customer.StreetName + " " + customer.City + " " + customer.State + " " + customer.ZipCode;
             IEnumerable<Address> addressToGeocode = await geocoder.GeocodeAsync(addressString);
             customer.Latitude = addressToGeocode.First().Coordinates.Latitude;
             customer.Longitude = addressToGeocode.First().Coordinates.Longitude;

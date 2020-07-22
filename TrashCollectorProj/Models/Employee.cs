@@ -18,12 +18,16 @@ namespace TrashCollectorProj.Models
         public IdentityUser IdentityUser { get; set; }
 
         [Required]
+        [Display(Name = "First Name")]
         public string FirstName { get; set; }
 
         [Required]
+        [Display(Name = "Last Name")]
         public string LastName { get; set; }
 
-        [Required]
-        public int ZipCode { get; set; }
+        [Required, MaxLength(5)]
+        [Display(Name = "Zip Code")]
+
+        public string ZipCode { get; set; }
     }
 }

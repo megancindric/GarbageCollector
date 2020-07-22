@@ -34,13 +34,13 @@ namespace TrashCollectorProj.Controllers
             viewModel.Customers = _context.Customers.Where(s => s.ZipCode == currentEmployee.ZipCode && s.PickupDay == viewModel.SelectedDay).ToList();
             foreach (Customer customer in extraPickupCustomers)
             {
-                if(customer.ZipCode == currentEmployee.ZipCode && customer.ExtraPickupDate.DayOfWeek.ToString() == viewModel.SelectedDay)
+                if (customer.ZipCode == currentEmployee.ZipCode && customer.ExtraPickupDate.DayOfWeek.ToString() == viewModel.SelectedDay)
                 {
                     viewModel.Customers.Add(customer);
 
                 }
             }
-            
+
             return View(viewModel);
 
         }
@@ -124,21 +124,6 @@ namespace TrashCollectorProj.Controllers
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
             return View(customer);
         }
-        public async Task<IActionResult> ConfirmExtraPickup(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var customer = await _context.Customers.FindAsync(id);
-            if (customer == null)
-            {
-                return NotFound();
-            }
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
-            return View(customer);
-        }
 
         // POST: Employees/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
@@ -187,72 +172,35 @@ namespace TrashCollectorProj.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                var customerToUpdate = _context.Customers.Where(s => s.Id == id).SingleOrDefault();
+
+                if (HasExtraPickup(customer) && customer.LastPickupDate != DateTime.UtcNow.Date)
+                //First check if today is an extra pickup day (& trash has not been collected today)
                 {
-                    customer.LastPickupDate = DateTime.UtcNow;
-                    customer.TrashFees += 30;
-                    _context.Update(customer);
+                    if (customer.ExtraPickupDate.DayOfWeek == DateTime.UtcNow.DayOfWeek)
+                    {
+                        customerToUpdate.LastPickupDate = DateTime.UtcNow;
+                        customerToUpdate.TrashFees += 30;
+                        customerToUpdate.ExtraPickupDate = default;
+                        _context.SaveChanges();
+                        return RedirectToAction("Index");
+                    }
+                }
+                else if (customer.PickupDay == DateTime.UtcNow.DayOfWeek.ToString() && customer.LastPickupDate != DateTime.UtcNow.Date)
+                {
+                    customerToUpdate.LastPickupDate = DateTime.UtcNow;
+                    customerToUpdate.TrashFees += 30;
                     _context.SaveChanges();
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction("Index");
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CustomerExists(customer.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                //Then check if today is a regular pickup day (& trash has not been collected today)
             }
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
             return View(customer);
+
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult ConfirmExtraPickup(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode,LastPickupDate,TrashFees,IsSuspended,SuspendedStartDate,SuspendedEndDate,ExtraPickupDate")]
- Customer customer)
-        {
-            if (id != customer.Id)
-            {
-                return NotFound();
-            }
 
-            if (HasExtraPickup(customer) == false)
-            {
-                return NotFound();
-            }
 
-            if (ModelState.IsValid)
-            {
-
-                try
-                {
-                    customer.ExtraPickupDate = default(DateTime);
-                    customer.LastPickupDate = DateTime.UtcNow;
-                    customer.TrashFees += 30;
-                    _context.Update(customer);
-                    _context.SaveChanges();
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CustomerExists(customer.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-            }
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
-            return View(customer);
-        }
 
         // GET: Employees/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -348,7 +296,5 @@ namespace TrashCollectorProj.Controllers
             _context.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
-
-       
     }
-}
+}  

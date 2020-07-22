@@ -76,23 +76,6 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.LastPickupDate)
                 </td>
-                @if (item.ExtraPickupDate != default)
-                {
-                    <td>
-                        @Html.DisplayFor(modelItem => item.ExtraPickupDate.Date)
-                    </td>
-                    <td>
-                        <a asp-action="ConfirmExtraPickup" asp-route-id="@item.Id">Confirm this Extra Pickup</a>
-                    </td>
-                }
-                else
-                {
-                    <td>
-                        No additional pickups scheduled at this time.
-                    </td>
-                    <td>
-                    </td>
-                }
                 <td>
                     <a asp-action="ConfirmPickup" asp-route-id="@item.Id">Confirm this Pickup</a>
                     <a asp-action="DeleteCustomer" asp-route-id="@item.Id">Remove Customer [TESTING PURPOSES]</a>

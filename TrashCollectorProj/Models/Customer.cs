@@ -18,30 +18,59 @@ namespace TrashCollectorProj.Models
         public IdentityUser IdentityUser { get; set; }
 
         [Required]
+        [Display(Name = "First Name")]
         public string FirstName { get; set; }
 
         [Required]
+        [Display(Name = "Last Name")]
         public string LastName { get; set; }
 
+        [Required, Phone]
+        [Display(Name = "Phone Number")]
         public int PhoneNumber { get; set; }
 
         [Required]
+        [Display(Name = "Regular Pickup Day")]
+
         public string PickupDay { get; set; }
+
         [Required]
+        [Display(Name = "Street Name")]
         public string StreetName { get; set; }
+
         [Required]
         public string City { get; set; }
+
         [Required]
         public string State { get; set; }
-        [Required]
-        public int ZipCode { get; set; }
-        public DateTime LastPickupDate { get; set; }
-        public double TrashFees { get; set; }
 
+        [Required, MaxLength(5)]
+        [Display(Name = "Zip Code")]
+
+        public string ZipCode { get; set; }
+
+        [DataType(DataType.Date)]
+        public DateTime LastPickupDate { get; set; }
+
+        private double trashFees = 50;
+
+        [Display(Name = "Current Balance")]
+        public double TrashFees 
+        { 
+            get { return trashFees; }
+            set { trashFees = value; }
+        }
+
+        [DataType(DataType.Date)]
+        [Display(Name = "Suspension Start Date")]
         public DateTime SuspendedStartDate { get; set; }
 
+        [DataType(DataType.Date)]
+        [Display(Name = "Suspension End Date")]
         public DateTime SuspendedEndDate { get; set; }
 
+        [DataType(DataType.Date)]
+        [Display(Name = "Extra Pickup Date")]
         public DateTime ExtraPickupDate { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }

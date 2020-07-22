@@ -1,9 +1,10 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Geocoding;
+using Geocoding.Google;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -70,6 +71,7 @@ namespace TrashCollectorProj.Controllers
    
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 customer.IdentityUserId = userId;
+                GeocodeCustomerAsync(customer);
                 _context.Add(customer);
                 _context.SaveChanges();
                 return RedirectToAction(nameof(Index));
@@ -278,7 +280,18 @@ namespace TrashCollectorProj.Controllers
         {
             return _context.Customers.Any(e => e.Id == id);
         }
+        public async Task<Customer> GeocodeCustomerAsync(Customer customer)
+        {
+            IGeocoder geocoder = new GoogleGeocoder() { ApiKey = "AIzaSyDYyltT3d7LeBJDgloGLVzGbNj4ndBOKa8" };
 
-       
+            string addressString = customer.StreetName + customer.City + customer.State + customer.ZipCode.ToString();
+            IEnumerable<Address> addressToGeocode = await geocoder.GeocodeAsync(addressString);
+            customer.Latitude = addressToGeocode.First().Coordinates.Latitude;
+            customer.Longitude = addressToGeocode.First().Coordinates.Longitude;
+            return customer;
+
+        }
+
     }
+  
 }

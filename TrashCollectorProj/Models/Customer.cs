@@ -43,6 +43,8 @@ namespace TrashCollectorProj.Models
         public DateTime SuspendedEndDate { get; set; }
 
         public DateTime ExtraPickupDate { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
 
         public Customer()
         {
@@ -50,6 +52,8 @@ namespace TrashCollectorProj.Models
             ExtraPickupDate = default;
             SuspendedStartDate = default;
             SuspendedEndDate = default;
+            Latitude = default;
+            Longitude = default;
             TrashFees = 0;
         }
 

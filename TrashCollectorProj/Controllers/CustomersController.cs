@@ -9,8 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TrashCollectorProj.Data;
 using TrashCollectorProj.Models;
-using GoogleMapsGeocoding;
-using GoogleMapsGeocoding.Common;
+using GoogleMaps.LocationServices;
 
 namespace TrashCollectorProj.Controllers
 {
@@ -58,7 +57,7 @@ namespace TrashCollectorProj.Controllers
             }
 
         }
-
+     
         // GET: Customers/Create
         public IActionResult Create()
         {
@@ -91,14 +90,14 @@ namespace TrashCollectorProj.Controllers
         public ActionResult Edit()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var customer = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+            var customer = _context.Customers.Where(c => c.IdentityUserId == userId).SingleOrDefault();
 
             return View(customer);
         }
         public ActionResult EditPickupDay()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var customer = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+            var customer = _context.Customers.Where(c => c.IdentityUserId == userId).SingleOrDefault();
 
             return View(customer);
         }
@@ -107,7 +106,7 @@ namespace TrashCollectorProj.Controllers
         public ActionResult ScheduleExtraPickup()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var customer = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+            var customer = _context.Customers.Where(c => c.IdentityUserId == userId).SingleOrDefault();
             if (customer == null)
             {
                 return NotFound();
@@ -118,7 +117,7 @@ namespace TrashCollectorProj.Controllers
         public ActionResult SuspendService()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var customer = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+            var customer = _context.Customers.Where(c => c.IdentityUserId == userId).SingleOrDefault();
             if (customer == null)
             {
                 return NotFound();
@@ -156,7 +155,7 @@ namespace TrashCollectorProj.Controllers
         public ActionResult EditPickupDay(int id, [Bind("PickupDay")] Customer customer)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var customerToUpdate = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault(); 
+            var customerToUpdate = _context.Customers.Where(c => c.IdentityUserId == userId).SingleOrDefault(); 
             customerToUpdate.PickupDay = customer.PickupDay;
             _context.SaveChanges();
             return RedirectToAction(nameof(Index));
@@ -170,8 +169,6 @@ namespace TrashCollectorProj.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customerToUpdate = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault(); 
-            if (ModelState.IsValid)
-            {
                 try
                 {
                     customerToUpdate.ExtraPickupDate = customer.ExtraPickupDate;
@@ -188,40 +185,32 @@ namespace TrashCollectorProj.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction("Index");
-
-            }
-            return View(customer);
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
         public ActionResult SuspendService(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode,LastPickupDate,TrashFees,IsSuspended,SuspendedStartDate,SuspendedEndDate,HasExtraPickup,ExtraPickupDate")] Customer customer)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var customerToUpdate = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault();
-            if (ModelState.IsValid)
+            var customerToUpdate = _context.Customers.Where(c => c.IdentityUserId == userId).SingleOrDefault();
+            try
             {
-                try
+                customerToUpdate.SuspendedStartDate = customer.SuspendedStartDate;
+                customerToUpdate.SuspendedEndDate = customer.SuspendedEndDate;
+                _context.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!CustomerExists(customer.Id))
                 {
-                    customerToUpdate.SuspendedStartDate = customer.SuspendedStartDate;
-                    customerToUpdate.SuspendedEndDate = customer.SuspendedEndDate;
-                    _context.SaveChanges();
-                    return RedirectToAction("Index");
+                    return NotFound();
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!CustomerExists(customer.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
             }
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
-            return View(customer);
+            return RedirectToAction("Index");
         }
 
         // GET: Customers/Delete/5
@@ -260,12 +249,18 @@ namespace TrashCollectorProj.Controllers
         }
         public Customer GeocodeCustomer(Customer customer)
         {
-            IGeocoder geocoder = new Geocoder("AIzaSyDYyltT3d7LeBJDgloGLVzGbNj4ndBOKa8");
+            AddressData address = new AddressData
+                {
+                    Address = customer.StreetName,
+                    City = customer.City,
+                    State = customer.State,
+                    Zip = customer.ZipCode
+                };
+            var geocodeRequest = new GoogleLocationService("AIzaSyDYyltT3d7LeBJDgloGLVzGbNj4ndBOKa8");
+            var latlong = geocodeRequest.GetLatLongFromAddress(address);
 
-            string addressString = customer.StreetName + " " + customer.City + " " + customer.State + " " + customer.ZipCode;
-            GeocodeResponse response = geocoder.Geocode(addressString);
-            customer.Latitude = response.Results[0].Geometry.Location.Lat;
-            customer.Longitude = response.Results[0].Geometry.Location.Lng;
+            customer.Latitude = latlong.Latitude;
+            customer.Longitude = latlong.Longitude;
             return customer;
 
         }

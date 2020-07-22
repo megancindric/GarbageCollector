@@ -63,13 +63,19 @@ namespace TrashCollectorProj.Models
 
         [DataType(DataType.Date)]
         [Display(Name = "Suspension Start Date")]
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
+
         public DateTime SuspendedStartDate { get; set; }
 
         [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
+
         [Display(Name = "Suspension End Date")]
         public DateTime SuspendedEndDate { get; set; }
 
         [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
+
         [Display(Name = "Extra Pickup Date")]
         public DateTime ExtraPickupDate { get; set; }
         public double Latitude { get; set; }

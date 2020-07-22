@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using TrashCollectorProj.Data;
 using TrashCollectorProj.Models;
 
@@ -23,45 +24,44 @@ namespace TrashCollectorProj.Controllers
         }
 
         // GET: Employees
-        public IActionResult Index()
+        public ActionResult Index()
         {
             EmployeeIndexViewModel viewModel = new EmployeeIndexViewModel();
             viewModel.DayOfWeekList = new SelectList(new List<string>() { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" });
             viewModel.SelectedDay = DateTime.Now.DayOfWeek.ToString();
+
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var currentEmployee = _context.Employees.Where(s => s.IdentityUserId == userId).FirstOrDefault();
-            var extraPickupCustomers = _context.Customers.Where(s => s.ExtraPickupDate != default).ToList();
-            viewModel.Customers = _context.Customers.Where(s => s.ZipCode == currentEmployee.ZipCode && s.PickupDay == viewModel.SelectedDay).ToList();
+            viewModel.Customers = _context.Customers.Where(s => s.ZipCode == currentEmployee.ZipCode && s.PickupDay == viewModel.SelectedDay && s.LastPickupDate != DateTime.Now).ToList();
+            //checks for correct zip, correct dayofweek, did not receive pickup today
+            var extraPickupCustomers = _context.Customers.Where(s => s.ExtraPickupDate != default && s.LastPickupDate != DateTime.Now).ToList();
             foreach (Customer customer in extraPickupCustomers)
             {
                 if (customer.ZipCode == currentEmployee.ZipCode && customer.ExtraPickupDate.DayOfWeek.ToString() == viewModel.SelectedDay)
                 {
+                    //checks for correct zip, correct dayofweek, did not receive pickup today (EXTRA PICKUPS ONLY)
                     viewModel.Customers.Add(customer);
-
                 }
             }
-
             return View(viewModel);
-
         }
 
         [HttpPost]
-        public IActionResult Index(EmployeeIndexViewModel viewModel)
+        public ActionResult Index(EmployeeIndexViewModel viewModel)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var currentEmployee = _context.Employees.Where(s => s.IdentityUserId == userId).FirstOrDefault();
-            var extraPickupCustomers = _context.Customers.Where(s => s.ExtraPickupDate != default).ToList();
-            viewModel.Customers = _context.Customers.Where(s => s.ZipCode == currentEmployee.ZipCode && s.PickupDay == viewModel.SelectedDay).ToList();
+            viewModel.Customers = _context.Customers.Where(s => s.ZipCode == currentEmployee.ZipCode && s.PickupDay == viewModel.SelectedDay && s.LastPickupDate != DateTime.Now).ToList();
+
+            var extraPickupCustomers = _context.Customers.Where(s => s.ExtraPickupDate != default && s.LastPickupDate != DateTime.Now).ToList();
             foreach (Customer customer in extraPickupCustomers)
             {
                 if (customer.ZipCode == currentEmployee.ZipCode && customer.ExtraPickupDate.DayOfWeek.ToString() == viewModel.SelectedDay)
                 {
                     viewModel.Customers.Add(customer);
-
                 }
             }
             return View(viewModel);
-
         }
 
 
@@ -93,35 +93,28 @@ namespace TrashCollectorProj.Controllers
         }
 
         // GET: Employees/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public IActionResult Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var employee = await _context.Employees.FindAsync(id);
+            var employee = _context.Employees.Where(s => s.Id == id).SingleOrDefault();
             if (employee == null)
             {
                 return NotFound();
             }
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", employee.IdentityUserId);
             return View(employee);
         }
 
-        public async Task<IActionResult> ConfirmPickup(int? id)
+        public IActionResult ConfirmPickup(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var customer = await _context.Customers.FindAsync(id);
+            var customer = _context.Customers.Where(s => s.Id == id).SingleOrDefault();
             if (customer == null)
             {
                 return NotFound();
             }
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
             return View(customer);
         }
 
@@ -170,8 +163,6 @@ namespace TrashCollectorProj.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
                 var customerToUpdate = _context.Customers.Where(s => s.Id == id).SingleOrDefault();
 
                 if (HasExtraPickup(customer) && customer.LastPickupDate != DateTime.UtcNow.Date)
@@ -194,7 +185,6 @@ namespace TrashCollectorProj.Controllers
                     return RedirectToAction("Index");
                 }
                 //Then check if today is a regular pickup day (& trash has not been collected today)
-            }
             return View(customer);
 
         }
@@ -274,6 +264,20 @@ namespace TrashCollectorProj.Controllers
             {
                 return false;
             }
+        }
+        public IActionResult CustomerDetails(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var customer = _context.Customers.Where(s => s.Id == id).SingleOrDefault();
+            if (customer == null)
+            {
+                return NotFound();
+            }
+            return View(customer);
         }
         public bool HasExtraPickup(Customer customer)
         {

@@ -72,18 +72,35 @@
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ExtraPickupDate.Date)
+            @Html.DisplayNameFor(model => model.ExtraPickupDate)
         </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.ExtraPickupDate.Date)
+                @Html.DisplayFor(model => model.ExtraPickupDate)
             </dd>
     </dl>
     <a asp-action="ScheduleExtraPickup">Schedule a 1-Time Extra Pickup</a>
 </div>
 <div>
-    <a asp-action="Edit">Edit User Profile</a> |
-    <a asp-action="EditPickupDay">Change Scheduled Pickup Day</a>
-    
+    <h4>Suspension of Service</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SuspendedStartDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SuspendedStartDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SuspendedEndDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SuspendedEndDate)
+        </dd>
+    </dl>
     <a asp-action="SuspendService">Temporarily Suspend Service</a>
+</div>
+<div>
+    <a asp-action="Edit">Edit User Profile</a> |
+    <a asp-action="EditPickupDay">Change Scheduled Pickup Day</a> |
 
 </div>

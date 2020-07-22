@@ -26,12 +26,22 @@ namespace TrashCollectorProj.Controllers
         public IActionResult Index()
         {
             EmployeeIndexViewModel viewModel = new EmployeeIndexViewModel();
-            viewModel.DayOfWeekList = new SelectList(Enum.GetValues(typeof(DayOfWeek)));
-            viewModel.SelectedDay = DateTime.Now.DayOfWeek;
+            viewModel.DayOfWeekList = new SelectList(new List<string>() { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" });
+            viewModel.SelectedDay = DateTime.Now.DayOfWeek.ToString();
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var nonSuspendedCustomers = _context.Customers.Where(s => !IsSuspended(s));
-            viewModel.Customers = nonSuspendedCustomers.Where((s => s.PickupDay == viewModel.SelectedDay || s.ExtraPickupDate.DayOfWeek == viewModel.SelectedDay)).ToList();
-            return View(viewModel.Customers);
+            var currentEmployee = _context.Employees.Where(s => s.IdentityUserId == userId).FirstOrDefault();
+            var extraPickupCustomers = _context.Customers.Where(s => s.ExtraPickupDate != default).ToList();
+            viewModel.Customers = _context.Customers.Where(s => s.ZipCode == currentEmployee.ZipCode && s.PickupDay == viewModel.SelectedDay).ToList();
+            foreach (Customer customer in extraPickupCustomers)
+            {
+                if(customer.ZipCode == currentEmployee.ZipCode && customer.ExtraPickupDate.DayOfWeek.ToString() == viewModel.SelectedDay)
+                {
+                    viewModel.Customers.Add(customer);
+
+                }
+            }
+            
+            return View(viewModel);
 
         }
 
@@ -39,10 +49,19 @@ namespace TrashCollectorProj.Controllers
         public IActionResult Index(EmployeeIndexViewModel viewModel)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var employee = _context.Employees.Where(c => c.IdentityUserId == userId);
-            var nonSuspendedCustomers = _context.Customers.Where(s => !IsSuspended(s));
-            viewModel.Customers = nonSuspendedCustomers.Where((s => s.PickupDay == viewModel.SelectedDay || s.ExtraPickupDate.DayOfWeek == viewModel.SelectedDay)).ToList();
-            return View(viewModel.Customers);
+            var currentEmployee = _context.Employees.Where(s => s.IdentityUserId == userId).FirstOrDefault();
+            var extraPickupCustomers = _context.Customers.Where(s => s.ExtraPickupDate != default).ToList();
+            viewModel.Customers = _context.Customers.Where(s => s.ZipCode == currentEmployee.ZipCode && s.PickupDay == viewModel.SelectedDay).ToList();
+            foreach (Customer customer in extraPickupCustomers)
+            {
+                if (customer.ZipCode == currentEmployee.ZipCode && customer.ExtraPickupDate.DayOfWeek.ToString() == viewModel.SelectedDay)
+                {
+                    viewModel.Customers.Add(customer);
+
+                }
+            }
+            return View(viewModel);
+
         }
 
 

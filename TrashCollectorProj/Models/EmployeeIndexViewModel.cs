@@ -10,9 +10,10 @@ namespace TrashCollectorProj.Models
     public class EmployeeIndexViewModel
     {
         public List<Customer> Customers { get; set; }
+
         public SelectList DayOfWeekList { get; set; }
 
-        public DayOfWeek SelectedDay { get; set; }
+        public string SelectedDay { get; set; }
 
     }
 }

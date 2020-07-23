@@ -53,6 +53,9 @@
                 @Html.DisplayNameFor(model => model.Customers[0].ExtraPickupDate)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.Customers[0].TrashFees)
+            </th>
+            <th>
                 Customer Options:
             </th>
             <th></th>
@@ -78,17 +81,20 @@
                 @Html.DisplayFor(modelItem => item.LastPickupDate)
             </td>
             @if (item.ExtraPickupDate != default)
-                {
+            {
                 <td>
                     @Html.DisplayFor(modelItem => item.ExtraPickupDate)
                 </td>
-                }
+            }
             else
             {
                 <td>
                     No Extra Pickups Scheduled.
                 </td>
             }
+            <th>
+                @Html.DisplayNameFor(model => model.Customers[0].ExtraPickupDate)
+            </th>
             <td>
                 <a asp-action="ConfirmPickup" asp-route-id="@item.Id">Confirm this Pickup</a> |
                 <a asp-action="CustomerDetails" asp-route-id="@item.Id">View Customer Details & Location</a> |
@@ -102,12 +108,14 @@
 
 @if (Model.Customers.Count > 0)
 {
-    <script>
+<script>
     // Initialize and add the map
     function initMap() {
         // The map, centered at custZip
+        var custLocation = { lat: @Model.Customers[0].Latitude, lng: @Model.Customers[0].Longitude}
         var map = new google.maps.Map(
-            document.getElementById('map'), { zoom: 13, center: @Model.Customers[0].ZipCode });
+            document.getElementById('map'), { zoom: 14, center: custLocation });
+
         @foreach(var customer in Model.Customers)
         {
             string custDetails = "var custLocation = { lat: " + customer.Latitude + ", lng: " + customer.Longitude + " };";
@@ -117,6 +125,6 @@
         }
 
     }
-    </script>
+</script>
     <div id="map"></div>
 }

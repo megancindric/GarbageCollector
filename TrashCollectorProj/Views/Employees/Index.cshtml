@@ -38,15 +38,6 @@
                 @Html.DisplayNameFor(model => model.Customers[0].PickupDay)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Customers[0].FirstName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Customers[0].LastName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Customers[0].ZipCode)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.Customers[0].LastPickupDate)
             </th>
             <th>
@@ -54,6 +45,12 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Customers[0].TrashFees)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Customers[0].LastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Customers[0].ZipCode)
             </th>
             <th>
                 Customer Options:
@@ -67,15 +64,6 @@
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.PickupDay)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FirstName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LastName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ZipCode)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.LastPickupDate)
@@ -92,12 +80,18 @@
                     No Extra Pickups Scheduled.
                 </td>
             }
-            <th>
-                @Html.DisplayNameFor(model => model.Customers[0].ExtraPickupDate)
-            </th>
             <td>
-                <a asp-action="ConfirmPickup" asp-route-id="@item.Id">Confirm this Pickup</a> |
-                <a asp-action="CustomerDetails" asp-route-id="@item.Id">View Customer Details & Location</a> |
+                @Html.DisplayFor(modelItem => item.TrashFees)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ZipCode)
+            </td>
+            <td>
+                <a asp-action="ConfirmPickup" asp-route-id="@item.Id">Confirm Pickup</a> |
+                <a asp-action="CustomerDetails" asp-route-id="@item.Id">View Customer Details</a> |
                 <a asp-action="DeleteCustomer" asp-route-id="@item.Id">Remove Customer [TESTING]</a>
             </td>
         </tr>

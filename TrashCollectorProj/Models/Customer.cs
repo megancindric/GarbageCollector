@@ -50,6 +50,8 @@ namespace TrashCollectorProj.Models
         public string ZipCode { get; set; }
 
         [DataType(DataType.Date)]
+        [Display(Name = "Last Pickup Date")]
+
         public DateTime LastPickupDate { get; set; }
 
         private double trashFees = 50;

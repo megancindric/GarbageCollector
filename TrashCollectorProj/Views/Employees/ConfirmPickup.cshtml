@@ -15,6 +15,12 @@
             <input type="hidden" asp-for="Id" />
             <dl class="row">
                 <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.TrashFees)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.TrashFees)
+                </dd>
+                <dt class="col-sm-2">
                     @Html.DisplayNameFor(model => model.PickupDay)
                 </dt>
                 <dd class="col-sm-10">
@@ -37,12 +43,6 @@
                 </dt>
                 <dd class="col-sm-10">
                     @Html.DisplayFor(model => model.LastPickupDate)
-                </dd>
-                <dt class="col-sm-2">
-                    @Html.DisplayNameFor(model => model.TrashFees)
-                </dt>
-                <dd class="col-sm-10">
-                    @Html.DisplayFor(model => model.TrashFees)
                 </dd>
             </dl>
             <div class="form-group">

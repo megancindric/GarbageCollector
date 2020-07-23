@@ -81,16 +81,6 @@ namespace TrashCollectorProj.Models
         public double Latitude { get; set; }
         public double Longitude { get; set; }
 
-        public Customer()
-        {
-            LastPickupDate = default;
-            ExtraPickupDate = default;
-            SuspendedStartDate = default;
-            SuspendedEndDate = default;
-            Latitude = default;
-            Longitude = default;
-            TrashFees = 0;
-        }
 
     }
 }

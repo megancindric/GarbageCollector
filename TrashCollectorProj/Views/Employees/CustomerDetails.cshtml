@@ -7,14 +7,14 @@
 
 }
 
-    <style>
-        #map {
-            width: 100%;
-            height: 400px;
-        }
-    </style>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDYyltT3d7LeBJDgloGLVzGbNj4ndBOKa8&callback=initMap">
-    </script>
+<style>
+    #map {
+        width: 100%;
+        height: 400px;
+    }
+</style>
+<script async defer src="@APIKey.APIURL">
+</script>
 
 <h1>Customer Location Details</h1>
 
@@ -85,6 +85,7 @@
 <script>
     // Initialize and add the map
     function initMap() {
+
         var custLocation = { lat: @Model.Latitude, lng: @Model.Longitude };
         // The map, centered at custlocation
         var map = new google.maps.Map(

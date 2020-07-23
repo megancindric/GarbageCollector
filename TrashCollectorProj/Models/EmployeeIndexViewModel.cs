@@ -14,6 +14,5 @@ namespace TrashCollectorProj.Models
         public SelectList DayOfWeekList = new SelectList(new List<string>() { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" });
 
         public string SelectedDay { get; set; }
-
     }
 }

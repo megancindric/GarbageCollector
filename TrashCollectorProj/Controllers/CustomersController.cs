@@ -71,19 +71,17 @@ namespace TrashCollectorProj.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create([Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,PickupDay,StreetName,City,State,ZipCode")]Customer customer)
         {
-            if (ModelState.IsValid)
-            {
-   
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 customer.IdentityUserId = userId;
-                customer = GeocodeCustomer(customer);
+            customer.LastPickupDate = default;
+            customer.ExtraPickupDate = default;
+            customer.SuspendedStartDate = default;
+            customer.SuspendedEndDate = default;
+            customer.TrashFees = 0;
+            customer = GeocodeCustomer(customer);
                 _context.Add(customer);
                 _context.SaveChanges();
                 return RedirectToAction(nameof(Index));
-
-            }
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
-            return View(customer);
         }
 
         // GET: Customers/Edit/5
@@ -256,7 +254,7 @@ namespace TrashCollectorProj.Controllers
                     State = customer.State,
                     Zip = customer.ZipCode
                 };
-            var geocodeRequest = new GoogleLocationService("AIzaSyDYyltT3d7LeBJDgloGLVzGbNj4ndBOKa8");
+            var geocodeRequest = new GoogleLocationService(APIKey.APIKeys);
             var latlong = geocodeRequest.GetLatLongFromAddress(address);
 
             customer.Latitude = latlong.Latitude;

@@ -1,9 +1,20 @@
 ﻿@model EmployeeIndexViewModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "CustomerDetails";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+
 }
+
+<style>
+    #map {
+        width: 100%;
+        height: 400px;
+    }
+</style>
+<script async defer src="@APIKey.APIURL">
+</script>
 
 <h1>Employee Dashboard</h1>
 
@@ -41,35 +52,71 @@
             <th>
                 @Html.DisplayNameFor(model => model.Customers[0].ExtraPickupDate)
             </th>
+            <th>
+                Customer Options:
+            </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model.Customers)
         {
-            <tr>
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.PickupDay)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ZipCode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastPickupDate)
+            </td>
+            @if (item.ExtraPickupDate != default)
+                {
                 <td>
-                    @Html.DisplayFor(modelItem => item.PickupDay)
+                    @Html.DisplayFor(modelItem => item.ExtraPickupDate)
                 </td>
+                }
+            else
+            {
                 <td>
-                    @Html.DisplayFor(modelItem => item.FirstName)
+                    No Extra Pickups Scheduled.
                 </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.LastName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ZipCode)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.LastPickupDate)
-                </td>
-                <td>
-                    <a asp-action="ConfirmPickup" asp-route-id="@item.Id">Confirm this Pickup</a>
-                    <a asp-action="CustomerDetails" asp-route-id="@item.Id">View Customer Details & Location</a>
-                    <a asp-action="DeleteCustomer" asp-route-id="@item.Id">Remove Customer [TESTING PURPOSES]</a>
-                </td>
-            </tr>
+            }
+            <td>
+                <a asp-action="ConfirmPickup" asp-route-id="@item.Id">Confirm this Pickup</a> |
+                <a asp-action="CustomerDetails" asp-route-id="@item.Id">View Customer Details & Location</a> |
+                <a asp-action="DeleteCustomer" asp-route-id="@item.Id">Remove Customer [TESTING]</a>
+            </td>
+        </tr>
 
         }
     </tbody>
 </table>
+
+@if (Model.Customers.Count > 0)
+{
+    <script>
+    // Initialize and add the map
+    function initMap() {
+        // The map, centered at custZip
+        var map = new google.maps.Map(
+            document.getElementById('map'), { zoom: 13, center: @Model.Customers[0].ZipCode });
+        @foreach(var customer in Model.Customers)
+        {
+            string custDetails = "var custLocation = { lat: " + customer.Latitude + ", lng: " + customer.Longitude + " };";
+            @Html.Raw(custDetails);
+            string custMarker = "var marker" + customer.Id + " = new google.maps.Marker({ position: custLocation, map: map });";
+            @Html.Raw(custMarker);
+        }
+
+    }
+    </script>
+    <div id="map"></div>
+}

@@ -28,17 +28,23 @@ namespace TrashCollectorProj.Controllers
         {
             EmployeeIndexViewModel viewModel = new EmployeeIndexViewModel();
             viewModel.SelectedDay = DateTime.Now.DayOfWeek.ToString();
-
+            viewModel.Customers = new List<Customer>();
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var currentEmployee = _context.Employees.Where(s => s.IdentityUserId == userId).FirstOrDefault();
-            viewModel.Customers = _context.Customers.Where(s => s.ZipCode == currentEmployee.ZipCode && s.PickupDay == viewModel.SelectedDay && s.LastPickupDate != DateTime.Now).ToList();
-            //checks for correct zip, correct dayofweek, did not receive pickup today
+            var regularCustomers = _context.Customers.Where(s => s.ZipCode == currentEmployee.ZipCode && s.PickupDay == viewModel.SelectedDay && s.LastPickupDate != DateTime.Now).ToList();
             var extraPickupCustomers = _context.Customers.Where(s => s.ExtraPickupDate != default && s.LastPickupDate != DateTime.Now).ToList();
+            foreach (Customer customer in regularCustomers)
+            {
+                if (!IsSuspended(customer))
+                {
+                    viewModel.Customers.Add(customer);
+                }
+            }
+
             foreach (Customer customer in extraPickupCustomers)
             {
-                if (customer.ZipCode == currentEmployee.ZipCode && customer.ExtraPickupDate.DayOfWeek.ToString() == viewModel.SelectedDay)
+                if (customer.ZipCode == currentEmployee.ZipCode && customer.ExtraPickupDate.DayOfWeek.ToString() == viewModel.SelectedDay && !IsSuspended(customer))
                 {
-                    //checks for correct zip, correct dayofweek, did not receive pickup today (EXTRA PICKUPS ONLY)
                     viewModel.Customers.Add(customer);
                 }
             }
@@ -50,12 +56,20 @@ namespace TrashCollectorProj.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var currentEmployee = _context.Employees.Where(s => s.IdentityUserId == userId).FirstOrDefault();
-            viewModel.Customers = _context.Customers.Where(s => s.ZipCode == currentEmployee.ZipCode && s.PickupDay == viewModel.SelectedDay && s.LastPickupDate != DateTime.Now).ToList();
-
+            viewModel.Customers = new List<Customer>();
+            var regularCustomers = _context.Customers.Where(s => s.ZipCode == currentEmployee.ZipCode && s.PickupDay == viewModel.SelectedDay && s.LastPickupDate != DateTime.Now).ToList();
             var extraPickupCustomers = _context.Customers.Where(s => s.ExtraPickupDate != default && s.LastPickupDate != DateTime.Now).ToList();
+            foreach (Customer customer in regularCustomers)
+            {
+                if (!IsSuspended(customer))
+                {
+                    viewModel.Customers.Add(customer);
+                }
+            }
+
             foreach (Customer customer in extraPickupCustomers)
             {
-                if (customer.ZipCode == currentEmployee.ZipCode && customer.ExtraPickupDate.DayOfWeek.ToString() == viewModel.SelectedDay)
+                if (customer.ZipCode == currentEmployee.ZipCode && customer.ExtraPickupDate.DayOfWeek.ToString() == viewModel.SelectedDay && !IsSuspended(customer))
                 {
                     viewModel.Customers.Add(customer);
                 }
@@ -89,8 +103,6 @@ namespace TrashCollectorProj.Controllers
             return View(employee);
         }
 
-      
-
         public IActionResult ConfirmPickup(int? id)
         {
             var customer = _context.Customers.Where(s => s.Id == id).SingleOrDefault();
@@ -101,8 +113,6 @@ namespace TrashCollectorProj.Controllers
             return View(customer);
         }
 
-        
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult ConfirmPickup(int id, Customer customer)
@@ -111,24 +121,23 @@ namespace TrashCollectorProj.Controllers
             {
                 return NotFound();
             }
-
                 var customerToUpdate = _context.Customers.Where(s => s.Id == id).SingleOrDefault();
 
-                if (HasExtraPickup(customer) && customer.LastPickupDate != DateTime.UtcNow.Date)
+                if (HasExtraPickup(customerToUpdate) && customerToUpdate.LastPickupDate != DateTime.UtcNow.Date)
                 //First check if today is an extra pickup day (& trash has not been collected today)
                 {
-                    if (customer.ExtraPickupDate.DayOfWeek == DateTime.UtcNow.DayOfWeek)
+                    if (customerToUpdate.ExtraPickupDate.DayOfWeek == DateTime.UtcNow.DayOfWeek && !IsSuspended(customerToUpdate))
                     {
-                        customerToUpdate.LastPickupDate = DateTime.UtcNow;
+                        customerToUpdate.LastPickupDate = DateTime.UtcNow.Date;
                         customerToUpdate.TrashFees += 30;
                         customerToUpdate.ExtraPickupDate = default;
                         _context.SaveChanges();
                         return RedirectToAction("Index");
                     }
                 }
-                else if (customer.PickupDay == DateTime.UtcNow.DayOfWeek.ToString() && customer.LastPickupDate != DateTime.UtcNow.Date)
+                else if (customerToUpdate.PickupDay == DateTime.UtcNow.DayOfWeek.ToString() && customerToUpdate.LastPickupDate.Date != DateTime.UtcNow.Date && !IsSuspended(customerToUpdate))
                 {
-                    customerToUpdate.LastPickupDate = DateTime.UtcNow;
+                    customerToUpdate.LastPickupDate = DateTime.UtcNow.Date;
                     customerToUpdate.TrashFees += 30;
                     _context.SaveChanges();
                     return RedirectToAction("Index");
@@ -197,12 +206,13 @@ namespace TrashCollectorProj.Controllers
         }
         public bool IsSuspended(Customer customer)
         {
-            var todaysDate = DateTime.Today.Date;
-            var customerStartDate = customer.SuspendedStartDate.Date;
-            var customerEndDate = customer.SuspendedEndDate.Date;
+            DateTime todaysDate = DateTime.Today;
+            DateTime customerStartDate = customer.SuspendedStartDate.Date;
+            DateTime customerEndDate = customer.SuspendedEndDate.Date;
             int startToday = DateTime.Compare(customerStartDate, todaysDate);
             int endToday = DateTime.Compare(customerEndDate, todaysDate);
             if (startToday <= 0 && endToday >= 0)
+                //Start date is before today
             {
                 return true;
             }
@@ -236,6 +246,7 @@ namespace TrashCollectorProj.Controllers
                 return false;
             }
         }
+
 
         [HttpPost, ActionName("DeleteCustomer")]
         [ValidateAntiForgeryToken]

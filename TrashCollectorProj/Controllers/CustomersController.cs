@@ -129,23 +129,33 @@ namespace TrashCollectorProj.Controllers
         [HttpPost]
         public ActionResult Edit(int id, [Bind("Id,IdentityUserId,FirstName,LastName,PhoneNumber,StreetName,City,State,ZipCode")] Customer customer)
         {
-            if (ModelState.IsValid)
-            {
-                try
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var customerToUpdate = _context.Customers.Where(c => c.IdentityUserId == userId).SingleOrDefault();
+            try
                 {
-                    var thisUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                    customer.IdentityUserId = thisUserId;
-                    customer = GeocodeCustomer(customer);
-                    _context.Customers.Update(customer);
-                    _context.SaveChanges();
+                customerToUpdate.FirstName = customer.FirstName;
+                customerToUpdate.LastName = customer.LastName;
+                customerToUpdate.PhoneNumber = customer.PhoneNumber;
+                customerToUpdate.StreetName = customer.StreetName;
+                customerToUpdate.City = customer.City;
+                customerToUpdate.State = customer.State;
+                customerToUpdate.ZipCode = customer.ZipCode;
+                customerToUpdate = GeocodeCustomer(customerToUpdate);
+                _context.SaveChanges();
                 }
-                catch
+                catch (DbUpdateConcurrencyException)
                 {
-                    return View();
-                }
+                    if (!CustomerExists(customer.Id))
+                    {
+                    return NotFound();
+                    }
+                    else
+                    {
+                    throw;
+                    }
+               }
                 return RedirectToAction("Index");
-            }
-            return View(customer);
+
         }
 
         [HttpPost]
